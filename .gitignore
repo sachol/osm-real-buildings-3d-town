@@ -1,0 +1,5 @@
+.env
+.bkit/
+node_modules/
+*.log
+re/*.prev.js
