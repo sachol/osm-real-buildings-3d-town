@@ -6,6 +6,7 @@
 <title>우리 동네 3D</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="re/re.css">
 <style>
 /* VOICE: 차분하고 정확한 건축 모형 설명
    IDEA: 실측 데이터로 만든 흰색 동네 축소 모형
@@ -79,7 +80,7 @@ body.cockpit #cockpit{display:block}
 <body>
 <div id="stage"><div id="labels"></div></div>
 <div class="card">
-  <h1>우리 동네 3D · 롯데월드타워</h1>
+  <h1>노량진 3D 부동산 지도</h1>
   <p>OpenStreetMap 실측 데이터로 만든 3D 도시입니다. 데이터를 불러오는 중입니다.</p>
   <div class="row">
     <button id="bNight" aria-pressed="false">밤 풍경</button>
@@ -92,7 +93,7 @@ body.cockpit #cockpit{display:block}
   <div id="lbCats" class="lbcats"></div>
   <form id="addrForm" class="addr" autocomplete="off">
     <label for="addrIn">주소로 다른 동네 만들기</label>
-    <div class="addrRow"><input id="addrIn" placeholder="예: 롯데월드타워 / 서울시청 / 해운대" required>
+    <div class="addrRow"><input id="addrIn" placeholder="예: 노량진역 / 흑석역 / 여의도" required>
     <select id="radIn" aria-label="반경"><option value="1">1 km</option><option value="3">3 km</option><option value="5">5 km</option></select>
     <button type="submit">만들기</button></div>
     <p id="addrMsg" class="addrMsg"></p>
@@ -749,7 +750,7 @@ function dijkstra(s,t,A){const N=gnodes.length,dist=new Float64Array(N).fill(Inf
   const pop=()=>{const top=hp[0],last=hp.pop();if(hp.length){hp[0]=last;let k=0;for(;;){const l=2*k+1,r=l+1;let m=k;if(l<hp.length&&hp[l][0]<hp[m][0])m=l;if(r<hp.length&&hp[r][0]<hp[m][0])m=r;if(m===k)break;[hp[m],hp[k]]=[hp[k],hp[m]];k=m;}}return top;};
   while(hp.length){const[d,i]=pop();if(d>dist[i])continue;if(i===t)break;for(const e of A[i]){const w=e.wi>=0?ways[e.wi]:null,c=d+e.len/(w?VMAX[w.t]||8:6);if(c<dist[e.to]){dist[e.to]=c;prev[e.to]=i;pw[e.to]=e.wi;push(c,e.to);}}}
   if(dist[t]===Infinity)return null;const path=[];for(let i=t;i!==-1;i=prev[i])path.push([i,pw[i]]);path.reverse();path.cost=dist[t];return path;}
-function nearestEdge(x,z){let best=null,bd=60;for(let a=0;a<gnodes.length;a++)for(const e of gadj[a]){const P=gnodes[a],Q=gnodes[e.to],vx=Q[0]-P[0],vz=Q[1]-P[1],
+function nearestEdge(x,z,maxD=60){let best=null,bd=maxD;for(let a=0;a<gnodes.length;a++)for(const e of gadj[a]){const P=gnodes[a],Q=gnodes[e.to],vx=Q[0]-P[0],vz=Q[1]-P[1],
   t=Math.max(0,Math.min(1,((x-P[0])*vx+(z-P[1])*vz)/(vx*vx+vz*vz||1))),px=P[0]+vx*t,pz=P[1]+vz*t,d=Math.hypot(px-x,pz-z);if(d<bd){bd=d;best={a,b:e.to,wi:e.wi,x:px,z:pz};}}return best;}
 const roadW=wi=>wi>=0?(ways[wi].w||RW[ways[wi].t]||7):7;
 const twoWay=wi=>wi<0||!ways[wi].one;
@@ -877,7 +878,7 @@ let pdown=null;
 renderer.domElement.addEventListener('pointerdown',e=>{pdown=[e.clientX,e.clientY];});
 renderer.domElement.addEventListener('pointerup',e=>{if(!pickMode||!pdown||Math.hypot(e.clientX-pdown[0],e.clientY-pdown[1])>6)return;
   const rc=renderer.domElement.getBoundingClientRect();ray.setFromCamera({x:(e.clientX-rc.left)/rc.width*2-1,y:-(e.clientY-rc.top)/rc.height*2+1},camera);
-  if(!ray.ray.intersectPlane(gplane,hit))return;const E=nearestEdge(hit.x,hit.z);if(!E){showToast('도로 가까이를 클릭해 주세요');return;}
+  if(!ray.ray.intersectPlane(gplane,hit))return;const camD=camera.position.distanceTo(controls.target),E=nearestEdge(hit.x,hit.z,Math.max(60,camD*.04));if(!E){showToast(camD>1500?'도로가 너무 작게 보입니다. 휠로 확대한 뒤 도로 위를 클릭해 주세요 (취소: Esc)':'도로 위나 바로 옆을 클릭해 주세요 (취소: Esc)');return;}
   if(pickMode===1){pickN=[E.x,E.z];ego.pins.push(pin(E.x,E.z,0x22c55e));pickMode=2;showToast('이제 도착점을 클릭하세요');}
   else{ego.pins.forEach(p=>scene.remove(p));ego.pins=[];pickMode=0;
     if(startRouteAt(pickN[0],pickN[1],E.x,E.z))showToast('');else{showToast('경로를 찾지 못했습니다. 출발점부터 다시 찍어 주세요');pickMode=1;}}});
@@ -962,15 +963,15 @@ function frame(){const raw=Math.min(clock.getDelta(),.05),dt=raw*motion;
   requestAnimationFrame(frame);}
 if(OSM){document.querySelector('.card h1').textContent='우리 동네 3D · '+(D.place||'검색 위치');
   document.querySelector('.card p').textContent=`${D.baked?'미리 받아 둔 OpenStreetMap 데이터('+D.baked.at.slice(0,10)+')로':'OpenStreetMap 실시간 데이터로'} 반경 ${RAD/1000} km를 만들었습니다. 층수·차로 수는 OSM에 있는 값을 쓰고, 없으면 건물·도로 종류별 추정값입니다.`+(D.floors?` 층수는 건축물대장(브이월드 GIS건물통합정보, ${D.floors.at}) ${D.floors.n.toLocaleString()}동을 반영했습니다.`:'')+(RAD>5000?' 반경이 커서 큰 건물과 주요 도로만 불러왔습니다.':'');
-  $('credit').innerHTML='지도 데이터 © OpenStreetMap 기여자 (ODbL)'+(D.baked?'':' · <a href="'+location.pathname+'" style="color:#2f7bff">롯데월드타워 기본 화면</a>');$('loadBar').style.width='100%';}
+  $('credit').innerHTML='지도 데이터 © OpenStreetMap 기여자 (ODbL)'+(D.baked?'':' · <a href="'+location.pathname+'" style="color:#2f7bff">노량진 기본 화면</a>');$('loadBar').style.width='100%';}
 document.getElementById('load').classList.remove('on');
 window.town3d={D,camera,controls,view,home,setXray,setNight,setView,startRouteAt,ego,HIDE,LMK,RWD,makeVehicle,makeEgo,scene,tick(n=1,dt=1/30){for(let i=0;i<n;i++){const m=ego.on?ego.mult:1;simT+=dt*m;updateSignals();npcStep(dt*m);railStep(simT);updateDrive(dt);}if(!ego.on||ego.view==='free')controls.update();renderer.render(scene,camera);placeLabels();},get simT(){return simT}};
 frame();
 }
 /* ===== 주소 → 반경 1·3·5 km 불러오기 (Nominatim + Overpass) ===== */
 const $id=id=>document.getElementById(id);
-const GH_PAGES='https://muzbox1973.github.io/osm-real-buildings-3d-town/';
-const qs=new URLSearchParams(location.search),qDef=!qs.get('addr'),qAddr=(qs.get('addr')||'').trim()||'롯데월드타워',qRr=parseFloat(qs.get('r')),qR=qRr>0?(qRr<=1.5?1:qRr<=3.5?3:5):(qDef?5:3);/* 반경은 1·3·5 km만 (다른 값은 가까운 값으로) */
+const GH_PAGES='https://sachol.github.io/osm-real-buildings-3d-town/';
+const qs=new URLSearchParams(location.search),qDef=!qs.get('addr'),qAddr=(qs.get('addr')||'').trim()||'노량진역',qRr=parseFloat(qs.get('r')),qR=qRr>0?(qRr<=1.5?1:qRr<=3.5?3:5):(qDef?3:3);/* 반경은 1·3·5 km만 (다른 값은 가까운 값으로) */
 const loadUI={on(){$id('load').classList.add('on');},t(m){$id('loadS').textContent=m;},p(f){$id('loadBar').style.width=Math.round(f*100)+'%';},err(m){const e=$id('loadE');e.style.color='';e.textContent=m;}};
 const NOMI='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=kr&accept-language=ko&q=';
 const OVP=['https://overpass-api.de/api/interpreter','https://overpass.private.coffee/api/interpreter','https://overpass.kumi.systems/api/interpreter','https://maps.mail.ru/osm/tools/overpass/api/interpreter'];
@@ -1053,10 +1054,10 @@ async function loadOverpassData(ctx,ui,sig){const{lat0,lon0,KX,KZ,R,dLat,dLon,lv
     const js=await overpass(oQuery(`${s},${w},${nn},${e}`,lv),OQ);
     for(const el of js.elements){const k=el.type+el.id;if(seen.has(k))continue;seen.add(k);convert(el);}
     UI.p(.05+.75*(i*n+j+1)/(n*n));}
-  if(lv>=2){UI.t('신호등 위치 받는 중');try{const js=await overpass(`[out:json][timeout:60];node["highway"="traffic_signals"](around:3000,${lat0},${lon0});out;`,OQ);for(const el of js.elements)if(el.type==="node")S.push([(el.lon-lon0)*KX,(lat0-el.lat)*KZ]);}catch(e){}}
+  if(lv>=2){UI.t('신호등 위치 받는 중');try{const js=await overpass(`[out:json][timeout:60];node["highway"="traffic_signals"](around:3000,${lat0},${lon0});out;`,OQ);for(const el of js.elements)if(el.type==="node")S.push([(el.lon-lon0)*KX,(lat0-el.lat)*KZ]);}catch(e){console.warn('신호등 위치를 받지 못했습니다(신호등은 추정 배치):',e.message);}}
   if(RLW.length){UI.t('철도·지하철 노선 정보 받는 중');try{const js=await overpass(`[out:json][timeout:60];rel["route"~"^(subway|light_rail|train|monorail|tram)$"](${lat0-dLat},${lon0-dLon},${lat0+dLat},${lon0+dLon});out body;`,OQ);
       const cm=new Map();for(const el of js.elements){if(el.type!=='relation'||!el.members)continue;const t=el.tags||{},c=lineColor(t);if(!c)continue;for(const m of el.members)if(m.type==='way'&&!cm.has(m.ref))cm.set(m.ref,c);}
-      for(const w of RLW)w[2]=cm.get(w[5])||0;}catch(e){}}
+      for(const w of RLW)w[2]=cm.get(w[5])||0;}catch(e){console.warn('지하철 노선색을 받지 못했습니다(기본색 사용):',e.message);}}
   for(const w of RLW){if(!w[2])w[2]=lineColor({name:w[3]})||0;w.length=5;}
   UI.t(`3D 장면을 만드는 중 · 건물 ${B.length.toLocaleString()}개, 도로 ${H.length.toLocaleString()}개, 철도 ${RLW.length.toLocaleString()}구간`);UI.p(.88);await sleep(60);
   return{B,H,A,S,RLW,ST,TW,FW,PL,src:'overpass'};}
@@ -1208,8 +1209,8 @@ $id('vwSave').onclick=()=>{const k=$id('vwKey').value.trim();try{if(k)localStora
 $id('addrIn').value=qAddr;if(qAddr)$id('radIn').value=String(qR);
 $id('addrForm').addEventListener('submit',async e=>{e.preventDefault();const a=$id('addrIn').value.trim(),r=$id('radIn').value,msg=$id('addrMsg');if(!a)return;
   msg.style.color='';msg.textContent='주소 검색 서버에 연결하는 중…';
-  try{const t=await fetch(NOMI+encodeURIComponent(a));if(!t.ok)throw new Error();}
-  catch(err){const url=GH_PAGES+'?addr='+encodeURIComponent(a)+'&r='+r;
+  let srvErr=0;try{const t=await fetch(NOMI+encodeURIComponent(a));if(!t.ok){srvErr=t.status;throw new Error('HTTP '+t.status);}}
+  catch(err){if(srvErr){msg.textContent='주소 검색 서버가 잠시 응답하지 않습니다 ('+srvErr+'). 1~2분 뒤 다시 눌러 주세요.';return;}const url=GH_PAGES+'?addr='+encodeURIComponent(a)+'&r='+r;
     msg.innerHTML='이 화면(Claude 아티팩트)에서는 외부 지도 서버 접속이 막혀 있습니다. 웹 버전에서 여세요: ';const l=document.createElement('a');l.href=url;l.target='_blank';l.rel='noopener';l.textContent='GitHub Pages에서 열기';msg.appendChild(l);return;}
   location.search='?addr='+encodeURIComponent(a)+'&r='+r;});
 const qDump=qs.has('dump'),qSrc=qs.get('src')||'auto';
@@ -1217,16 +1218,26 @@ function bootSafe(D){try{boot(D);}catch(e){console.error(e);loadUI.err('장면�
 /* 기본 화면 데이터(롯데월드타워 반경 5 km): GitHub Actions가 미리 만든 data.js — 파일로 열거나 아티팩트에서도 동작 */
 function loadBaked(){return new Promise((res,rej)=>{if(window.TOWN3D_BAKED)return res(window.TOWN3D_BAKED);const sc=document.createElement('script');sc.src='data.js';
   sc.onload=()=>window.TOWN3D_BAKED?res(window.TOWN3D_BAKED):rej(new Error('기본 데이터가 비어 있습니다'));sc.onerror=()=>rej(new Error('기본 데이터(data.js)를 불러오지 못했습니다'));document.head.appendChild(sc);});}
-async function loadDefault(){loadUI.on();loadUI.t('롯데월드타워 반경 5 km 데이터를 여는 중');loadUI.p(.2);
+async function loadDefault(){loadUI.on();loadUI.t('노량진 3D 지도 데이터를 여는 중');loadUI.p(.2);
   let D;try{D=await loadBaked();}catch(e){return loadOSM(qAddr,qR*1000);}
   if(vwCfg()&&D.lat0){const KX=111320*Math.cos(D.lat0*Math.PI/180);try{await enrichFloors(D,{lat0:D.lat0,lon0:D.lon0,KX,KZ:110950,R:D.r||5000},true);}catch(e){console.warn(e);}}
   loadUI.p(.88);await sleep(30);return D;}
-function homeLink(){const a=document.createElement('a');a.href=location.pathname;a.textContent='롯데월드타워 기본 화면 보기';$id('loadS').textContent='';$id('loadS').appendChild(a);}
+function homeLink(){const a=document.createElement('a');a.href=location.pathname;a.textContent='노량진 기본 화면 보기';$id('loadS').textContent='';$id('loadS').appendChild(a);}
 if(!window.THREE||!THREE.OrbitControls){$id('err').style.display='grid';}
 else if(qDump){loadOSM(qAddr,qR*1000,{src:qSrc}).then(D=>{window.__DUMP=JSON.stringify(D);},e=>{window.__DUMPERR=String(e&&e.message||e);});}
 else (qDef?loadDefault():loadOSM(qAddr,qR*1000)).then(bootSafe).catch(e=>{loadUI.err(e.message);if(!qDef)homeLink();});
 
 }
 </script>
+<!-- 부동산 레이어 (공인중개사용 확장) -->
+<script src="re/re-config.js"></script>
+<script src="re/re-core.js"></script>
+<script src="re/re-data.js"></script>
+<script src="re/sgg-codes.js"></script>
+<script src="re/re-map.js"></script>
+<script src="re/re-card.js"></script>
+<script src="re/re-keys.js"></script>
+<script src="re/re-live.js"></script>
+<script src="re/re-tour.js"></script>
 </body>
 </html>

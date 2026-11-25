@@ -1,0 +1,91 @@
+/* 부동산 레이어 화면 디자인 — 원본 변수(--card, --ink, --sub, --btn, --acc)를 그대로 쓴다 */
+.re-brand{margin:-4px 0 10px;font-weight:700;color:var(--acc);font-size:13px}
+.re-src{display:inline}
+
+/* 오른쪽 패널 */
+.re-panel{position:fixed;right:16px;top:80px;z-index:3;width:min(300px,calc(100vw - 32px));background:var(--card);border-radius:16px;padding:12px 14px;box-shadow:0 8px 30px rgba(0,0,0,.18);backdrop-filter:blur(8px);color:var(--ink)}
+.re-head{display:flex;align-items:center;justify-content:space-between}.re-head b{font-size:15px}
+.re-fold{min-height:32px;padding:0 10px;font-size:12px}
+.re-panel.folded .re-body{display:none}
+body.driving .re-panel,body.driving .re-card{display:none}
+.re-body>small{display:block;margin:10px 0 4px;font-size:12px;color:var(--sub)}
+.re-seg{display:flex;flex-wrap:wrap;gap:6px}.re-seg button{min-height:38px;padding:0 11px;font-size:13px}
+.re-tour-btn{background:#e53e3e!important;color:#fff!important}
+.re-legend{margin-top:12px;font-size:12px}.re-legend b{display:block;margin-bottom:4px}
+.re-legend i{display:block;height:10px;border-radius:5px}
+.re-ticks{display:flex;justify-content:space-between;margin-top:2px;color:var(--sub);font-variant-numeric:tabular-nums}
+.re-legend em{display:block;margin-top:4px;font-style:normal;color:var(--sub)}
+.re-note{margin:10px 0 0;font-size:12px;color:var(--sub)}
+
+/* 가격표 · 사무소 이름표 */
+.re-tag{position:absolute;left:0;top:0;padding:3px 9px 4px;border-radius:10px;background:rgba(255,255,255,.95);border:2.5px solid #999;color:#18222f;
+  font:600 11px/1.3 'Noto Sans KR',sans-serif;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.2);text-align:center;will-change:transform}
+.re-tag b{display:block;font-weight:600;color:#4c5a6b;font-size:10.5px}.re-tag span{display:block;font-size:13px;font-weight:800;font-variant-numeric:tabular-nums}
+.re-office{position:absolute;left:0;top:0;padding:5px 12px;border-radius:999px;background:#e53e3e;color:#fff;font:800 13px/1.4 'Noto Sans KR',sans-serif;white-space:nowrap;box-shadow:0 4px 14px rgba(229,62,62,.45);will-change:transform}
+
+/* 단지 정보 카드 */
+.re-card{position:fixed;right:16px;top:80px;bottom:16px;z-index:4;width:min(380px,calc(100vw - 32px));overflow:auto;background:var(--card);color:var(--ink);border-radius:16px;
+  padding:16px 18px;box-shadow:0 10px 36px rgba(0,0,0,.25);backdrop-filter:blur(8px);transform:translateX(110%);transition:transform .35s ease;visibility:hidden}
+.re-card.on{transform:none;visibility:visible}
+.re-x{position:absolute;right:10px;top:10px;min-height:36px;width:36px;padding:0;font-size:20px;line-height:1}
+.re-card h2{margin:0 40px 2px 0;font-size:19px;line-height:1.25;text-wrap:balance}
+.re-card header p{margin:0 0 10px;font-size:12px;color:var(--sub)}
+.re-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.re-kpi div{background:var(--btn);border-radius:10px;padding:7px 8px}
+.re-kpi small{display:block;font-size:11px;color:var(--sub)}.re-kpi b{display:block;font-size:18px;font-weight:800;font-variant-numeric:tabular-nums}
+.re-kpi em{display:block;font-style:normal;font-size:10.5px;color:var(--sub)}
+.re-chart{width:100%;height:auto;margin:4px 0 6px}
+.re-chart .g{stroke:rgba(127,127,127,.25);stroke-width:1}.re-chart .ax{font-size:9px;fill:var(--sub)}.re-chart text{fill:var(--sub)}
+.re-dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:8px 0;font-size:13px}
+.re-dl dt{color:var(--sub)}.re-dl dd{margin:0;font-weight:600}
+.re-tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+.re-tbl caption{text-align:left;font-weight:700;padding-bottom:4px}
+.re-tbl td{padding:4px 2px;border-top:1px solid rgba(127,127,127,.2)}.re-num{text-align:right;font-weight:800;font-variant-numeric:tabular-nums}
+.re-foot{margin:10px 0 0;font-size:11px;color:var(--sub)}
+
+/* 발표 모드 */
+body.present .card,body.present .hint,body.present .re-panel .re-body>:not(.re-legend),body.present .re-head{display:none}
+body.present .re-panel{top:auto;bottom:150px;width:260px;padding:10px 12px}
+.re-sub{display:none;position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:6;width:min(980px,calc(100vw - 32px));background:rgba(20,33,58,.92);color:#fff;
+  border-radius:18px;padding:16px 22px 12px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
+body.present .re-sub{display:block}
+.re-sub b{display:block;font-size:clamp(20px,2.6vw,30px);line-height:1.25;font-weight:800;text-wrap:balance}
+.re-sub p{margin:6px 0 8px;font-size:clamp(14px,1.6vw,19px);opacity:.9}
+.re-nav{display:flex;align-items:center;gap:8px;justify-content:flex-end}.re-nav span{font-size:13px;opacity:.75;font-variant-numeric:tabular-nums}
+.re-nav button{min-height:36px;padding:0 12px;background:rgba(255,255,255,.14);color:#fff}
+body.present .re-card{top:20px;bottom:170px}
+
+@media(max-width:600px){
+  .re-panel{top:auto;bottom:12px;right:12px;left:12px;width:auto;max-height:45vh;overflow:auto}
+  .re-card{top:12px;bottom:12px;right:12px;left:12px;width:auto}
+  .re-tag b{display:none}
+}
+@media(prefers-reduced-motion:reduce){.re-card{transition:none}}
+
+/* ⚙ API 설정창 */
+.re-keys{width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 32px);border:0;border-radius:18px;padding:0;background:var(--card);color:var(--ink);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.re-keys::backdrop{background:rgba(10,18,32,.45)}
+.re-keys form{padding:18px 20px 16px}
+.re-keys h2{margin:0 0 4px;font-size:20px}
+.re-keys-note{margin:0 0 12px;font-size:12.5px;color:var(--sub)}
+.re-keys section{border-top:1px solid rgba(127,127,127,.25);padding:12px 0}
+.re-keys h3{display:flex;align-items:center;gap:8px;margin:0;font-size:16px}.re-keys h3 em{font-style:normal;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:#c6f6d5;color:#22543d}
+.re-keys section>p{margin:4px 0;font-size:13px}
+.re-keys ol{margin:4px 0;padding-left:20px;font-size:13px}.re-keys a{color:var(--acc)}
+.re-keys-help{color:var(--sub);font-size:12px!important}
+.re-keys-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.re-keys-row input{flex:1 1 200px;font:14px ui-monospace,Consolas,monospace;min-height:44px;padding:0 10px;border-radius:10px;border:1px solid rgba(127,127,127,.4);background:var(--btn);color:var(--ink)}
+.re-keys-out{list-style:none;margin:6px 0 0;padding:0;font-size:13px}.re-keys-out .ok{color:#2f855a}.re-keys-out .bad{color:#c53030}
+.re-keys-act{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid rgba(127,127,127,.25);padding-top:12px}
+.re-keys-act .primary{background:var(--acc);color:#fff}
+.re-keys-msg{margin:8px 0 0;font-size:13px}.re-keys-msg.ok{color:#2f855a}.re-keys-msg.bad{color:#c53030}
+
+/* 실시간 불러오기 진행 상자 */
+.re-live{position:fixed;left:16px;bottom:60px;z-index:5;width:min(380px,calc(100vw - 32px));background:var(--card);color:var(--ink);border-radius:14px;padding:12px 14px;box-shadow:0 8px 30px rgba(0,0,0,.22)}
+.re-live p{margin:0 0 6px;font-size:13px}
+.re-live i{display:block;height:8px;border-radius:4px;background:var(--btn);overflow:hidden;margin-bottom:8px}.re-live i b{display:block;height:100%;background:var(--acc);transition:width .3s}
+.re-live button{min-height:38px;font-size:13px;margin-right:6px}
+.re-brief{display:flex;align-items:center;justify-content:center;min-height:40px;margin-top:10px;border-radius:10px;background:var(--btn);color:var(--ink);text-decoration:none;font-weight:700;font-size:13px}
+
+/* 한글은 단어 중간에서 줄을 바꾸지 않게 */
+.re-panel,.re-card,.re-sub,.re-keys,.re-live,.re-office{word-break:keep-all;overflow-wrap:anywhere}

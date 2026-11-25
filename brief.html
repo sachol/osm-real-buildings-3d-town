@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14213a">
+<meta name="description" content="국토교통부 실거래가와 건축물대장으로 만든 우리 동네 아파트 시세 브리핑">
+<title>노량진 아파트 시세 브리핑</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="re/brief.css">
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="brief.html"><img src="icons/icon.svg" alt="" width="34" height="34"><span><b id="bTitle">아파트 시세 브리핑</b><small id="bBrand"></small></span></a>
+  <button id="install" hidden>홈 화면에 추가</button>
+</header>
+<p class="notice" id="notice">실거래 신고 기준 참고 자료입니다.</p>
+<main>
+  <section class="hero" aria-labelledby="heroT">
+    <p class="eyebrow" id="eyebrow"></p>
+    <h1 id="heroT">우리 동네 아파트, 최근 12개월 시세</h1>
+    <p class="lead" id="heroS"></p>
+    <div class="kpis" id="kpis"></div>
+    <a class="open3d" href="./">3D 시세 지도 열기</a>
+    <a class="tour" href="./?tour=1">▶ 발표 모드로 보기</a>
+  </section>
+  <section class="office" id="office" hidden></section>
+  <section class="list" aria-labelledby="listT">
+    <h2 id="listT">단지 찾아보기</h2>
+    <div class="tools">
+      <label class="sr" for="q">단지명 검색</label><input id="q" type="search" placeholder="단지명이나 동 이름" autocomplete="off">
+      <label class="sr" for="sort">정렬</label>
+      <select id="sort"><option value="pp">평당가 높은 순</option><option value="n">거래 많은 순</option><option value="st">역 가까운 순</option><option value="new">새 아파트 순</option><option value="jr">전세가율 높은 순</option></select>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="분류"></div>
+    <p class="count" id="count" aria-live="polite"></p>
+    <ol class="cards" id="cards"></ol>
+    <button class="more" id="more" hidden>더 보기</button>
+  </section>
+</main>
+<footer class="foot" id="foot"></footer>
+<script src="re/re-config.js"></script>
+<script src="re/re-core.js"></script>
+<script src="re/re-data.js"></script>
+<script src="re/brief.js"></script>
+<script>
+if ('serviceWorker' in navigator && location.protocol === 'https:') {
+  navigator.serviceWorker.register('sw.js').catch(e => console.warn('오프라인 저장을 켜지 못했습니다:', e.message));
+}
+</script>
+</body>
+</html>

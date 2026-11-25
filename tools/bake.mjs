@@ -25,7 +25,8 @@ const server = http.createServer((req, res) => {
   });
 }).listen(8765);
 
-const browser = await chromium.launch();
+// BAKE_CHANNEL=chrome 이면 PC에 설치된 크롬을 쓴다(Playwright 전용 브라우저를 내려받지 않아도 됨)
+const browser = await chromium.launch(process.env.BAKE_CHANNEL ? { channel: process.env.BAKE_CHANNEL } : {});
 async function run(src, timeout) {
   const page = await browser.newPage();
   // data.js 는 OSM 데이터만 담아 ODbL 로 공개한다. 브이월드(건축물대장) 데이터는 넣지 않는다 — 앱에서 각자 키로 화면에만 사용
@@ -53,5 +54,5 @@ if (!out) { console.error('no data'); process.exit(1); }
 const D = JSON.parse(out);
 D.baked = { at: new Date().toISOString(), src: used, addr: ADDR, r: +RKM };
 fs.mkdirSync(path.dirname(OUT), { recursive: true });
-fs.writeFileSync(OUT, '/* 롯데월드타워 반경 5 km · © OpenStreetMap 기여자 (ODbL) · tools/bake.mjs 로 생성 */\nwindow.TOWN3D_BAKED=' + JSON.stringify(D) + ';\n');
+fs.writeFileSync(OUT, '/* ' + ADDR + ' 반경 ' + RKM + ' km · © OpenStreetMap 기여자 (ODbL) · tools/bake.mjs 로 생성 */\nwindow.TOWN3D_BAKED=' + JSON.stringify(D) + ';\n');
 console.log(`saved ${OUT} (${used}) floors=${D.floors ? D.floors.n : 'none'}${D.floorsErr ? ' err=' + D.floorsErr : ''} buildings=${D.B.length} roads=${D.H.length} rail=${D.RLW.length} bytes=${fs.statSync(OUT).size}`);
