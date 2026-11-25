@@ -37,9 +37,9 @@
       id: 'vworld', name: '브이월드', store: 'town3d.vworldKey', cost: '무료',
       use: '건물 지상층수·높이(GIS건물통합정보) → 3D 건물 높이를 실제에 가깝게 (원본 기능)',
       steps: [['브이월드 오픈API 인증키 발급', 'https://www.vworld.kr/dev/v4dv_apikey_s001.do']],
-      help: '활용 API에 "2D 데이터 API"를 고르고, 서비스 URL에 이 페이지 주소(' + location.origin + ')를 등록하세요.',
-      tests: [['GIS건물통합정보', k => fetch(`https://api.vworld.kr/req/data?service=data&version=2.0&request=GetFeature&data=LT_C_BLDGINFO&format=json&errorFormat=json&size=1&geometry=false&attribute=true&crs=EPSG:4326&geomFilter=BOX(126.94,37.51,126.941,37.511)&key=${encodeURIComponent(k)}&domain=${encodeURIComponent(location.origin)}`, { signal: AbortSignal.timeout(15000) })
-        .then(r => r.json()).then(j => { const s = j.response && j.response.status; return s === 'OK' || s === 'NOT_FOUND' ? { ok: true } : { ok: false, msg: (j.response && j.response.error && j.response.error.text) || s || '오류' }; })]],
+      help: '브이월드 [인증키 정보 수정]에서 서비스유형을 "웹사이트"로 고르고, 서비스URL에 ' + location.origin + ' 을 넣어 저장하세요. 이 주소가 등록돼 있어야 이 사이트에서 키가 동작합니다. 활용 API에는 "2D데이터 API"가 체크돼 있어야 합니다.',
+      tests: [['GIS건물통합정보', k => window.vwJsonp(`https://api.vworld.kr/req/data?service=data&version=2.0&request=GetFeature&data=LT_C_BLDGINFO&format=json&errorFormat=json&size=1&geometry=false&attribute=true&crs=EPSG:4326&geomFilter=BOX(126.94,37.51,126.941,37.511)&key=${encodeURIComponent(k)}&domain=${encodeURIComponent(location.origin)}`, 15000)
+        .then(j => { const s = j.response && j.response.status; return s === 'OK' || s === 'NOT_FOUND' ? { ok: true } : { ok: false, msg: (j.response && j.response.error && j.response.error.text) || s || '오류' }; })]],
     },
   ];
   RE.PROVIDERS = PROVIDERS;
