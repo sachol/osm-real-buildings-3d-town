@@ -1166,13 +1166,20 @@ async function loadOSM(addr,R,opt={}){loadUI.on();{const h=document.querySelecto
    키: 화면의 '건축물대장 층수 쓰기' 칸(localStorage). 받은 값은 이 브라우저 화면에만 쓰고 파일로 저장·배포하지 않는다
    OSM 건물 중심점이 대장 건물 도형 안에 있거나, 대장 건물 중심점이 OSM 건물 안에 있으면 그 층수·높이를 쓴다 */
 const VW_API='https://api.vworld.kr/req/data';
+/* 브이월드는 다른 사이트의 직접 요청(fetch, CORS)을 허용하지 않아 '<script> 꼬리표 + callback'(JSONP) 방식으로 받는다 */
+let vwSeq=0;
+function vwJsonp(u,ms){return new Promise((ok,no)=>{const cb='__vw'+Date.now().toString(36)+(vwSeq++),s=document.createElement('script');
+  const end=()=>{clearTimeout(tm);delete window[cb];s.remove();};
+  const tm=setTimeout(()=>{end();no(new Error('브이월드 응답 없음'));},ms);
+  window[cb]=j=>{end();ok(j);};s.onerror=()=>{end();no(new Error('브이월드 연결 실패'));};
+  s.src=u+'&callback='+cb;document.head.appendChild(s);});}
 const vwBbox=f=>{let a=1e9,b=-1e9,c=1e9,d=-1e9;for(let i=0;i<f.length;i+=2){a=Math.min(a,f[i]);b=Math.max(b,f[i]);c=Math.min(c,f[i+1]);d=Math.max(d,f[i+1]);}return[a,b,c,d];};
 const vwPip=(x,z,f)=>{let c=false;for(let i=0,j=f.length-2;i<f.length;j=i,i+=2){const xi=f[i],zi=f[i+1],xj=f[j],zj=f[j+1];if((zi>z)!==(zj>z)&&x<(xj-xi)*(z-zi)/(zj-zi)+xi)c=!c;}return c;};
 function vwCfg(){if(qs.has('dump'))return null;/* 공개 데이터(data.js)에는 브이월드 데이터를 넣지 않는다 — 각자 키로 화면에서만 사용 */let k='';try{k=localStorage.getItem('town3d.vworldKey')||'';}catch(e){}return k?{key:k,domain:location.origin}:null;}
 const vwProp=(p,...names)=>{for(const n of names){for(const k of[n,n.toUpperCase(),n.toLowerCase()])if(p[k]!=null&&p[k]!=='')return p[k];}return null;};
 async function vwPage(cfg,box,page,sig){const u=VW_API+'?service=data&version=2.0&request=GetFeature&data=LT_C_BLDGINFO&format=json&errorFormat=json&size=1000&page='+page+
     '&geometry=true&attribute=true&crs=EPSG:4326&geomFilter=BOX('+box.join(',')+')&key='+encodeURIComponent(cfg.key)+'&domain='+encodeURIComponent(cfg.domain);
-  const r=await fetchT(u,30000,sig),j=await r.json(),R=j.response||{};
+  const j=await vwJsonp(u,30000),R=j.response||{};
   if(R.status==='NOT_FOUND')return{feats:[],pages:0};if(R.status!=='OK')throw new Error('V-World '+(R.status||'')+' '+((R.error&&(R.error.text||R.error.code))||''));
   return{feats:(R.result&&R.result.featureCollection&&R.result.featureCollection.features)||[],pages:+(R.page&&R.page.total)||1};}
 async function enrichFloors(D,ctx,ui){const cfg=vwCfg();if(!cfg||ctx.R>5000)return 0;const{lat0,lon0,KX,KZ,R}=ctx,UI=ui?loadUI:{t(){},p(){}};
