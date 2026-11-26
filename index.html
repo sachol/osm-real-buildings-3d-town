@@ -180,7 +180,9 @@ function Grid(cell){const m=new Map();return{add(b,it){for(let x=Math.floor(b[0]
 /* 같은 재질끼리 하나의 메시로 합치기 (건물 수만 채도 빠르게) */
 const GL=[],BL=[];/* GL: 지면층 메시(지하철 보기에서 반투명), BL: 건물 메시 */
 const xBatch=new Map();
-function addExtrude(f,h,side,roof,base=0,holes=null){let g;try{g=new THREE.ExtrudeGeometry(shapeOf(f,holes),{depth:h,bevelEnabled:false});}catch(e){return;}
+/* vk: 벽 창문 무늬 세로 배율. 창문 무늬는 3 m 에 한 줄이라, 층고가 높은 건물(예: 9층 41 m)은 층수보다 줄이 많아 보인다 → 층수만큼 줄이 나오게 늘이거나 줄인다 */
+function addExtrude(f,h,side,roof,base=0,holes=null,vk=1){let g;try{g=new THREE.ExtrudeGeometry(shapeOf(f,holes),{depth:h,bevelEnabled:false});}catch(e){return;}
+  if(vk!==1)for(const gr of g.groups)if(gr.materialIndex){const U=g.attributes.uv.array;for(let i=gr.start;i<gr.start+gr.count;i++)U[i*2+1]*=vk;}
   g.rotateX(-Math.PI/2);if(base)g.translate(0,base,0);const key=side.uuid+'|'+roof.uuid;let b=xBatch.get(key);if(!b)xBatch.set(key,b={mats:[roof,side],parts:[[],[]],n:[0,0]});
   const P=g.attributes.position.array,N=g.attributes.normal.array,U=g.attributes.uv.array;
   for(const gr of g.groups){const mi=gr.materialIndex?1:0;b.parts[mi].push([P.subarray(gr.start*3,(gr.start+gr.count)*3),N.subarray(gr.start*3,(gr.start+gr.count)*3),U.subarray(gr.start*2,(gr.start+gr.count)*2)]);b.n[mi]+=gr.count;}}
@@ -471,7 +473,7 @@ for(const bE of B){const[t,lv,name,f]=bE;const bb=bbox(f),cx=(bb[0]+bb[1])/2,cz=
   if(OSM){fl=osmFloors(t,lv,ar);side=colorHex(bE[7],pick(OCOL[t]||cc));const rc=colorHex(bE[10],0);roof=rc?roofOf(rc):OROOF[t]?roofOf(pick(OROOF[t])):roofM;
     const top=bE[4]||fl*(t==='a'?2.9:t==='i'?4.5:3.3),base=Math.min(bE[5]||0,top-1),rs=bE[6]||'',sh=/^(pyramidal|hipped|cone|dome|onion|round|half-dome|gabled|skillion|gambrel|mansard)$/.test(rs);
     let rh=0;if(sh)rh=bE[9]||Math.min((top-base)*.45,/dome|onion|round/.test(rs)?Math.sqrt(ar/Math.PI):Math.sqrt(ar)*.3);
-    const wt=Math.max(base+.5,top-rh);addExtrude(f,wt-base,sideMat(side),roof,base,bE[12]);if(rh>.3)roofTris(f,wt,rh,rs,dMat(rc||(OROOF[t]?pick(OROOF[t]):0x8a9aa3)));continue;}
+    const wt=Math.max(base+.5,top-rh),vk=lv>0&&bE[4]>0&&!base?Math.max(.5,Math.min(2,lv*3/(wt-base))):1;addExtrude(f,wt-base,sideMat(side),roof,base,bE[12],vk);if(rh>.3)roofTris(f,wt,rh,rs,dMat(rc||(OROOF[t]?pick(OROOF[t]):0x8a9aa3)));continue;}
 }
 
 flushExtrude();

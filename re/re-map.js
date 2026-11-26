@@ -29,8 +29,21 @@
     RE.T = T; RE.D = D;
     const same = RD && D.lat0 && Math.abs(RD.meta.lat0 - D.lat0) < 1e-4 && Math.abs(RD.meta.lon0 - D.lon0) < 1e-4;
     if (same) return boot(RD);
+    /* 지도 자료(data.js)는 매달·코드 수정 때 자동으로 다시 만들어지는데, 그때 '노량진역' 주소 검색 결과가 조금씩 달라져
+       지도 중심이 수십~수백 m 옮겨질 수 있다. 1.5 km 안쪽 차이면 부동산 자료를 그만큼 옮겨서 맞춘다(원본은 그대로 두고 새 객체로). */
+    const moved = RD && D.lat0 && shiftTo(RD, D);
+    if (moved) return boot(moved);
     if (RE.live && D.osm) return RE.live.begin();
     console.warn('[RE] 이 지도에 맞는 부동산 데이터가 없어 부동산 레이어를 켜지 않습니다.');
+  }
+  function shiftTo(RD, D) {
+    const KX = 111320 * Math.cos(D.lat0 * Math.PI / 180), KZ = 110950;
+    const dx = (RD.meta.lon0 - D.lon0) * KX, dz = (D.lat0 - RD.meta.lat0) * KZ;
+    if (!Number.isFinite(dx) || Math.hypot(dx, dz) > 1500) return null;
+    const mv = o => (o && Number.isFinite(o.x) ? { ...o, x: Math.round((o.x + dx) * 10) / 10, z: Math.round((o.z + dz) * 10) / 10 } : o);
+    console.warn(`[RE] 지도 중심이 부동산 자료와 ${Math.round(Math.hypot(dx, dz))} m 달라 부동산 자료를 옮겨 맞춥니다.`);
+    return { ...RD, meta: { ...RD.meta, lat0: D.lat0, lon0: D.lon0, shifted: [Math.round(dx), Math.round(dz)] },
+      C: RD.C.map(mv), office: mv(RD.office), ST: (RD.ST || []).map(([n, x, z, ...r]) => [n, x + dx, z + dz, ...r]) };
   }
   function boot(RD) {
     const T = RE.T, D = RE.D;
