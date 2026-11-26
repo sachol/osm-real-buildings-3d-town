@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>우리 동네 3D</title>
+<title>신화AI 3D 부동산 라이브 지도</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="re/re.css">
@@ -80,7 +80,7 @@ body.cockpit #cockpit{display:block}
 <body>
 <div id="stage"><div id="labels"></div></div>
 <div class="card">
-  <h1>노량진 3D 부동산 지도</h1>
+  <h1>신화AI 3D 부동산 라이브 지도</h1>
   <p>OpenStreetMap 실측 데이터로 만든 3D 도시입니다. 데이터를 불러오는 중입니다.</p>
   <div class="row">
     <button id="bNight" aria-pressed="false">밤 풍경</button>
@@ -167,7 +167,7 @@ const areaOf=f=>{let s=0;for(let i=0;i<f.length;i+=2){const j=(i+2)%f.length;s+=
 const dSeg=(px,pz,ax,az,bx,bz)=>{const vx=bx-ax,vz=bz-az,t=Math.max(0,Math.min(1,((px-ax)*vx+(pz-az)*vz)/(vx*vx+vz*vz||1)));return Math.hypot(ax+vx*t-px,az+vz*t-pz);};
 const shapeOf=(f,holes)=>{const s=new THREE.Shape();for(let i=0;i<f.length;i+=2)i?s.lineTo(f[i],-f[i+1]):s.moveTo(f[i],-f[i+1]);
   if(holes)for(const h of holes){if(!h||h.length<6)continue;const q=new THREE.Path();for(let i=0;i<h.length;i+=2)i?q.lineTo(h[i],-h[i+1]):q.moveTo(h[i],-h[i+1]);s.holes.push(q);}return s;};
-function flat(f,mat,y,single){let g;try{g=new THREE.ShapeGeometry(shapeOf(f));}catch(e){return;}g.rotateX(-Math.PI/2);g.translate(0,y,0);
+function flat(f,mat,y,single,holes){let g;try{g=new THREE.ShapeGeometry(shapeOf(f,holes||null));}catch(e){return;}g.rotateX(-Math.PI/2);g.translate(0,y,0);
   if(single){const m=new THREE.Mesh(g,mat);m.receiveShadow=true;scene.add(m);return m;}const ng=g.index?g.toNonIndexed():g;addTris(mat,ng.attributes.position.array);}
 function walk(f,step,fn){for(let i=2;i<f.length;i+=2){const ax=f[i-2],az=f[i-1],bx=f[i],bz=f[i+1],L=Math.hypot(bx-ax,bz-az);if(!L)continue;const n=Math.max(1,Math.round(L/step));
   for(let k=0;k<n;k++){const t=(k+.5)/n;fn(ax+(bx-ax)*t,az+(bz-az)*t,(bx-ax)/L,(bz-az)/L,L/n);}}}
@@ -201,7 +201,7 @@ const MAINW=8;
 /* 면 정보(공원·숲·단지 마당 등) */
 const AC={stadium:[0xc9c7bd,2],track:[0xb5523e,6],playground:[0xd8c39a,6],residential:[0xd0d4c6,1],school:[0xe4dfd2,2],construction:[0xb7a77f,2],grass:[0xa9c48a,3],farmland:[0xbdc896,3],village_green:[0x9fbf82,3],
   park:[0x8fb874,4],wood:[0x6f9457,5],forest:[0x6f9457,5],pitch:[0x86b35e,6],parking:[0x9a9ea3,7],water:[0x8cc3de,8],commercial:[0xdcd6cc,1],industrial:[0xcfccc4,1],hospital:[0xe2dcd8,2]};
-for(const[k,,f]of A){const c=AC[k];if(c)flat(f,Mc(c[0],c[1]),.05);}
+for(const[k,,f,ho]of A){const c=AC[k];if(c)flat(f,Mc(c[0],c[1]),.05,false,ho||null);}
 /* 공원·광장 산책로 */
 if(RAD<=5000)for(const f of(D.FW||[]))ribbon(f,2.2,Mc(0xe7dfcd,3),()=>-.045);
 flushTris();
@@ -961,7 +961,7 @@ function frame(){const raw=Math.min(clock.getDelta(),.05),dt=raw*motion;
   updateSignals();npcStep(sdt);railStep(simT);
   updateDrive(raw);if(!ego.on||ego.view==='free')controls.update();renderer.render(scene,camera);placeLabels();cmp.style.transform=`rotate(${controls.getAzimuthalAngle()}rad)`;
   requestAnimationFrame(frame);}
-if(OSM){document.querySelector('.card h1').textContent='우리 동네 3D · '+(D.place||'검색 위치');
+if(OSM){document.querySelector('.card h1').textContent=(window.RE_CONFIG&&RE_CONFIG.title)||('우리 동네 3D · '+(D.place||'검색 위치'));
   document.querySelector('.card p').textContent=`${D.baked?'미리 받아 둔 OpenStreetMap 데이터('+D.baked.at.slice(0,10)+')로':'OpenStreetMap 실시간 데이터로'} 반경 ${RAD/1000} km를 만들었습니다. 층수·차로 수는 OSM에 있는 값을 쓰고, 없으면 건물·도로 종류별 추정값입니다.`+(D.floors?` 층수는 건축물대장(브이월드 GIS건물통합정보, ${D.floors.at}) ${D.floors.n.toLocaleString()}동을 반영했습니다.`:'')+(RAD>5000?' 반경이 커서 큰 건물과 주요 도로만 불러왔습니다.':'');
   $('credit').innerHTML='지도 데이터 © OpenStreetMap 기여자 (ODbL)'+(D.baked?'':' · <a href="'+location.pathname+'" style="color:#2f7bff">노량진 기본 화면</a>');$('loadBar').style.width='100%';}
 document.getElementById('load').classList.remove('on');
@@ -1019,6 +1019,15 @@ function areaKind(t){if(t.leisure==='park'||t.leisure==='garden'||t.landuse==='r
   if(/^(grass|meadow|cemetery)$/.test(t.landuse||'')||/^(scrub|grassland)$/.test(t.natural||''))return'grass';if(t.landuse==='farmland')return'farmland';
   if(t.landuse==='residential')return'residential';if(t.landuse==='construction')return'construction';if(/^(commercial|retail)$/.test(t.landuse||''))return'commercial';
   if(t.landuse==='industrial')return'industrial';if(/^(school|university|college|kindergarten)$/.test(t.amenity||''))return'school';if(t.amenity==='parking')return'parking';if(t.amenity==='hospital')return'hospital';return null;}
+/* 여러 조각(way)으로 된 OSM 관계(relation)의 외곽선을 끝점끼리 이어 닫힌 고리들로 만든다.
+   예전에는 첫 조각 하나만 써서 한강처럼 큰 강이 일부만 그려졌다. */
+function ringsOf(members,role){const kp=p=>p.lat+','+p.lon,segs=members.filter(m=>m.role===role&&m.geometry&&m.geometry.length>1).map(m=>m.geometry.slice()),out=[];
+  while(segs.length){let ring=segs.shift();
+    for(let g=0;g<5000&&kp(ring[0])!==kp(ring.at(-1));g++){const end=kp(ring.at(-1));let i=segs.findIndex(q=>kp(q[0])===end);
+      if(i>=0){ring=ring.concat(segs.splice(i,1)[0].slice(1));continue;}i=segs.findIndex(q=>kp(q.at(-1))===end);
+      if(i>=0){ring=ring.concat(segs.splice(i,1)[0].reverse().slice(1));continue;}break;}
+    if(ring.length>2)out.push(ring);}
+  return out;}
 /* Overpass(OSM 원본) 경로: 차로 수·신호등·3D 부품·노선색까지 가장 자세함. ui=false면 화면 표시 없이 뒤에서 받음 */
 async function loadOverpassData(ctx,ui,sig){const{lat0,lon0,KX,KZ,R,dLat,dLon,lv,tol}=ctx,n=R<=2000?1:R<=10000?2:R<=15000?3:4,UI=ui?loadUI:{t(){},p(){}},OQ={sig,quiet:!ui};
   const B=[],H=[],A=[],S=[],RLW=[],ST=[],TW=[],FW=[],PL=[],seen=new Set(),P=gm=>gm.map(p=>[(p.lon-lon0)*KX,(lat0-p.lat)*KZ]),r1=a=>Math.round(a*10)/10;
@@ -1031,6 +1040,13 @@ async function loadOverpassData(ctx,ui,sig){const{lat0,lon0,KX,KZ,R,dLat,dLon,lv
       else if(t.man_made&&parseFloat(t.height)>=80)TW.push([r1(x),r1(z),parseFloat(t.height),t.name||'']);
       else if(t.name&&x*x+z*z<R*R){if(t.place)PL.push([t.name,r1(x),r1(z),/^(city|town)$/.test(t.place)?3e6:t.place==='suburb'?1.2e6:5e5,'place']);
         else if(t.tourism||t.historic)PL.push([t.name,r1(x),r1(z),3e5,'heritage']);else if(t.amenity)PL.push([t.name,r1(x),r1(z),/hospital|university|townhall/.test(t.amenity)?1.5e5:6e4,'edu']);}return;}
+    if(el.type==='relation'&&el.members&&!t.building&&!t['building:part']&&!t.railway&&!t.highway){const k=areaKind(t);if(!k)return;
+      const ring=gm=>{let q=P(gm);if(q[0][0]===q.at(-1)[0]&&q[0][1]===q.at(-1)[1])q.pop();return dpL(q,2*tol);};
+      const inn=ringsOf(el.members,'inner').map(ring).filter(q=>q.length>=3).map(q=>q.flat().map(r1));
+      for(const og of ringsOf(el.members,'outer')){const q=ring(og);if(q.length<3)continue;const bx=[Math.min(...q.map(v=>v[0])),Math.max(...q.map(v=>v[0])),Math.min(...q.map(v=>v[1])),Math.max(...q.map(v=>v[1]))];
+        if(!inside(q)&&!(bx[0]<0&&bx[1]>0&&bx[2]<0&&bx[3]>0))continue;const f=q.flat().map(r1);if(areaF(f)<(lv>=2?3000:300))continue;
+        const ho=inn.filter(h=>h[0]>bx[0]&&h[0]<bx[1]&&h[1]>bx[2]&&h[1]<bx[3]);A.push(ho.length?[k,t.name||'',f,ho]:[k,t.name||'',f]);}
+      return;}
     let gm=el.geometry;if(!gm&&el.members){const o=el.members.find(m=>m.role==='outer'&&m.geometry);gm=o&&o.geometry;}if(!gm||gm.length<2)return;
     let pts=P(gm);if(!inside(pts))return;
     if(t.railway){if(!/^(rail|subway|light_rail|monorail|narrow_gauge|tram)$/.test(t.railway)||/^(yard|siding|spur|crossover)$/.test(t.service||''))return;
@@ -1246,5 +1262,6 @@ else (qDef?loadDefault():loadOSM(qAddr,qR*1000)).then(bootSafe).catch(e=>{loadUI
 <script src="re/re-keys.js"></script>
 <script src="re/re-live.js"></script>
 <script src="re/re-tour.js"></script>
+<script src="re/re-view.js"></script>
 </body>
 </html>

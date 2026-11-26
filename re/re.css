@@ -89,3 +89,22 @@ body.present .re-card{top:20px;bottom:170px}
 
 /* 한글은 단어 중간에서 줄을 바꾸지 않게 */
 .re-panel,.re-card,.re-sub,.re-keys,.re-live,.re-office{word-break:keep-all;overflow-wrap:anywhere}
+
+/* ===== 제목 아래 동네 줄 · 왼쪽 카드 접기 · 손님용 전체 화면 (re-view.js) ===== */
+.card h1{padding-right:64px}
+.re-place{margin:4px 0 6px;font-size:14px;font-weight:700;color:var(--ink)}
+.re-cfold{position:absolute;top:12px;right:12px;min-height:32px;padding:0 10px;font-size:12px}
+.card.folded>:not(h1):not(.re-place):not(.re-cfold){display:none}
+.card.folded .re-place{margin-bottom:0}
+.re-kiosk-bar{display:none;position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:4;align-items:center;gap:10px;padding:6px 8px 6px 6px;border-radius:999px;background:var(--card);box-shadow:0 4px 16px rgba(0,0,0,.18);opacity:.55;transition:opacity .2s}
+.re-kiosk-bar:hover,.re-kiosk-bar:focus-within{opacity:1}
+.re-kiosk-bar button{min-height:32px;padding:0 12px;font-size:13px}
+.re-kiosk-src{font-size:11px;color:var(--sub);white-space:nowrap}
+body.kiosk .card,body.kiosk .hint{display:none}
+/* 전체 화면: 오른쪽 패널은 색 안내(범례)만 왼쪽 아래에 작게 */
+body.kiosk .re-panel{top:auto;right:auto;left:16px;bottom:16px;width:240px;max-height:none;padding:10px 12px;opacity:.92}
+body.kiosk .re-panel .re-head,body.kiosk .re-panel .re-body>:not(.re-legend){display:none}
+body.kiosk .re-panel.folded .re-body{display:block}
+body.kiosk .re-panel .re-legend{margin-top:0}
+body.kiosk .re-kiosk-bar{display:flex}
+@media(max-width:600px){.re-kiosk-src{display:none}body.kiosk .re-panel{left:12px;right:auto;bottom:64px;width:200px}}
