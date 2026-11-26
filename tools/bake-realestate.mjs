@@ -9,7 +9,8 @@ const ROOT = process.cwd();
 const OUT = process.env.RE_OUT || 're/re-data.js';
 const MONTHS = +(process.env.RE_MONTHS || 12);
 const SGG = { '11590': '동작구', '11560': '영등포구', '11170': '용산구', '11620': '관악구' };
-const OFFICE = { name: '신화공인중개사사무소', addr: '서울 동작구 만양로18길 19-13', road: '만양로18길' };
+/* lat·lon: 브이월드 주소 검색(도로명)으로 확인한 건물 위치(2026-11-26). Nominatim 은 이 번지를 찾지 못해 도로 가운데로 잡혔었다 */
+const OFFICE = { name: '신화공인중개사사무소', addr: '서울 동작구 만양로18길 19-13', road: '만양로18길', lat: 37.51321842400718, lon: 126.94598880589432 };
 const UA = 'town3d-realestate-bake/1.0';
 
 /* ---------- 공통 도구 ---------- */
@@ -296,8 +297,10 @@ async function main() {
   console.log('4) 사무소 위치');
   const office = { ...OFFICE, x: 0, z: 0, how: '' };
   const road = (D.H || []).find(h => h[3] === OFFICE.road);
-  const og = await nominatim(D, OFFICE.addr, isBuilding);
-  if (og) { [office.x, office.z] = og; office.how = 'nominatim'; }
+  const KXo = 111320 * Math.cos(D.lat0 * Math.PI / 180), KZo = 110950;
+  const og = OFFICE.lat ? null : await nominatim(D, OFFICE.addr, isBuilding);
+  if (OFFICE.lat) { office.x = +((OFFICE.lon - D.lon0) * KXo).toFixed(1); office.z = +((D.lat0 - OFFICE.lat) * KZo).toFixed(1); office.how = 'vworld'; delete office.lat; delete office.lon; }
+  else if (og) { [office.x, office.z] = og; office.how = 'nominatim'; }
   else if (road) { const f = road[4], k = (f.length / 4 | 0) * 2; office.x = f[k]; office.z = f[k + 1]; office.how = 'road'; }
   console.log(`   ${office.how || '못 찾음'} (${office.x.toFixed(0)}, ${office.z.toFixed(0)})`);
 
