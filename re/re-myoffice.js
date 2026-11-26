@@ -20,6 +20,10 @@
   }
   const my = read();
   RE.myOffice = my;
+  /* 사이트 기본 설정(대표님 사무소). 설정창에 '지금 기본 지도' 안내로 보여 준다 */
+  const base = window.RE_CONFIG || {};
+  const baseName = (base.office && base.office.label) || base.brand || '';
+  const baseTel = (base.contact && base.contact.tel) || '';
 
   /* ---------- 설정 적용(원본 RE_CONFIG 는 그대로 두고 새 객체로) ---------- */
   if (my && window.RE_CONFIG) {
@@ -64,7 +68,8 @@
     const el = RE.el;
     dlg = el('dialog', 're-keys re-my-dlg'); dlg.setAttribute('aria-label', '내 사무소 설정');
     const form = el('form');
-    form.append(el('h2', null, '🏢 내 사무소로 바꾸기'),
+    const baseLine = baseName ? el('p', 're-my-base', `${my ? '기본 지도' : '지금 지도'}: ${baseName}${baseTel ? ' · ' + baseTel : ''} (기본 설정). 이 사무소라면 아무것도 넣지 않아도 됩니다.`) : null;
+    form.append(el('h2', null, '🏢 다른 사무소로 바꾸기 (수강생용)'), ...(baseLine ? [baseLine] : []),
       el('p', 're-keys-note', '사무소 이름과 주소를 넣으면 이 브라우저에서는 내 사무소 주변 3D 시세 지도로 바뀝니다. 이 브라우저에만 저장되고 인터넷으로 보내지 않습니다. 시세를 보려면 ⚙ API 설정에 공공데이터포털 키도 넣어 주세요. 처음 열 때는 지도와 실거래를 받느라 1분 정도 걸릴 수 있습니다.'));
     field(form, '사무소 이름', 'name', { req: true, ph: '예: ○○공인중개사사무소' });
     field(form, '제작 표기', 'brand', { ph: '비워 두면 사무소 이름 (예: ○○부동산)' });
@@ -102,7 +107,7 @@
   function addButton() {
     const card = document.querySelector('.card'), credit = document.getElementById('credit');
     if (!card || card.querySelector('.re-my-btn')) return;
-    const b = RE.el('button', 're-my-btn', my ? `🏢 내 사무소: ${my.name} (바꾸기)` : '🏢 내 사무소로 바꾸기');
+    const b = RE.el('button', 're-my-btn', my ? `🏢 내 사무소: ${my.name} (바꾸기)` : '🏢 다른 사무소로 바꾸기 (수강생용)');
     b.type = 'button'; b.onclick = open;
     if (credit) credit.before(b); else card.append(b);
   }

@@ -150,3 +150,4 @@ body.idle .re-kiosk-bar,body.idle .re-panel{display:none}
 .re-my-btn:hover,.re-my-btn:focus-visible{color:var(--acc);border-color:var(--acc)}
 .re-my-f{display:flex;flex-direction:column;gap:4px;margin:0 0 10px;font-size:13px;font-weight:700}
 .re-my-f input,.re-my-f select{min-height:42px;padding:0 10px;border-radius:10px;border:1px solid rgba(127,127,127,.4);background:var(--btn);color:var(--ink);font-size:14px;font-weight:400}
+.re-my-base{margin:0 0 10px;padding:8px 10px;border-radius:10px;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.25);font-size:13px;line-height:1.5;word-break:keep-all}
