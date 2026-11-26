@@ -232,5 +232,5 @@
     } else if (Date.now() - t0 > 180000) { clearInterval(wait); console.warn('[매물] 부동산 레이어가 준비되지 않아 매물 핀을 켜지 못했습니다.'); }
   }, 300);
 
-  RE.listings = { reload: buildPins, open: openDialog };
+  RE.listings = { reload: buildPins, open: openDialog, groups: () => groups().m, compare, priceText };
 })();

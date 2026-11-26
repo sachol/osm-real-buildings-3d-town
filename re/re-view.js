@@ -56,7 +56,7 @@
   function enter(asGuest = false) {
     src.textContent = srcText();
     body.classList.add('kiosk');
-    if (asGuest && !guest) { guest = true; rotBefore = !!(ctl() && ctl().autoRotate); setRotate(true); }
+    if (asGuest && !guest) { guest = true; body.classList.add('guest'); rotBefore = !!(ctl() && ctl().autoRotate); setRotate(true); }
     if (fsEl()) return;
     const root = document.documentElement, req = root.requestFullscreen || root.webkitRequestFullscreen;
     if (!req) return; // 전체 화면을 못 쓰는 브라우저(아이폰 등): 메뉴만 숨긴다
@@ -65,7 +65,7 @@
   function leaveKiosk() {
     body.classList.remove('kiosk');
     clearTimeout(resumeT);
-    if (guest) { guest = false; setRotate(rotBefore); }
+    if (guest) { guest = false; body.classList.remove('guest'); setRotate(rotBefore); }
   }
   function exit() {
     leaveKiosk();
