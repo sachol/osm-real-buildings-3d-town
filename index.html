@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>우리 동네 3D</title>
+<title>신화AI 3D 부동산 라이브 지도</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="re/re.css">
@@ -76,11 +76,14 @@ body.cockpit #cockpit{display:block}
 @media(max-width:600px){.nav b{font-size:20px}.nav svg{width:42px;height:42px}#mini{width:140px;height:140px;bottom:auto;top:96px}.spd b{font-size:34px}}
 @media(max-width:600px){.card{padding:12px 14px}.card h1{font-size:17px}.card p,.card small{display:none}button{font-size:13px;padding:0 10px}.hint{display:none}.lb{font-size:11px}}
 </style>
+<!-- 설정은 먼저 읽는다: 내 사무소 설정(수강생용)이 있으면 그 동네로 바로 시작해야 하므로 -->
+<script src="re/re-config.js"></script>
+<script src="re/re-myoffice.js"></script>
 </head>
 <body>
 <div id="stage"><div id="labels"></div></div>
 <div class="card">
-  <h1>노량진 3D 부동산 지도</h1>
+  <h1>신화AI 3D 부동산 라이브 지도</h1>
   <p>OpenStreetMap 실측 데이터로 만든 3D 도시입니다. 데이터를 불러오는 중입니다.</p>
   <div class="row">
     <button id="bNight" aria-pressed="false">밤 풍경</button>
@@ -102,7 +105,7 @@ body.cockpit #cockpit{display:block}
       <p id="vwMsg" class="addrMsg">키가 있으면 지도를 열 때(기본 화면·주소 모드) 건물마다 건축물대장 지상층수·높이를 받아 화면에만 씁니다. 키 발급 때 서비스 URL을 이 페이지 주소로 등록하세요. 키는 이 브라우저에만 저장됩니다.</p></details>
   </form>
   <small id="credit">지도 데이터 © OpenStreetMap 기여자 (ODbL)</small>
-  <small class="dev">개발: GPT PARK · <a href="https://www.youtube.com/@AIFACT-GPTPARK" target="_blank" rel="noopener">유튜브</a> · <a href="https://gptparkai.com/" target="_blank" rel="noopener">공식 사이트</a></small>
+  <small class="dev">원작: GPT PARK의 <a href="https://github.com/muzbox1973/osm-real-buildings-3d-town" target="_blank" rel="noopener">OSM Real Buildings 3D Town</a> (MIT)</small>
 </div>
 <div id="toast"></div>
 <div id="cockpit"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" width="100%" height="100%"><path d="M0 900V700Q800 610 1600 700V900Z" fill="#15181d"/><path d="M0 700Q800 610 1600 700" stroke="#2b3038" stroke-width="10" fill="none"/><g transform="translate(560 860)"><circle r="190" fill="none" stroke="#0e1014" stroke-width="42"/><path d="M-185 -10H185M0 -10V180" stroke="#0e1014" stroke-width="34"/><circle r="46" fill="#1c2026"/><text y="10" text-anchor="middle" fill="#38bdf8" font-size="28" font-weight="700">AUTO</text></g><path d="M0 0L120 0 40 700H0Z" fill="#101318" opacity=".9"/><path d="M1600 0L1480 0 1560 700H1600Z" fill="#101318" opacity=".9"/></svg></div>
@@ -167,7 +170,7 @@ const areaOf=f=>{let s=0;for(let i=0;i<f.length;i+=2){const j=(i+2)%f.length;s+=
 const dSeg=(px,pz,ax,az,bx,bz)=>{const vx=bx-ax,vz=bz-az,t=Math.max(0,Math.min(1,((px-ax)*vx+(pz-az)*vz)/(vx*vx+vz*vz||1)));return Math.hypot(ax+vx*t-px,az+vz*t-pz);};
 const shapeOf=(f,holes)=>{const s=new THREE.Shape();for(let i=0;i<f.length;i+=2)i?s.lineTo(f[i],-f[i+1]):s.moveTo(f[i],-f[i+1]);
   if(holes)for(const h of holes){if(!h||h.length<6)continue;const q=new THREE.Path();for(let i=0;i<h.length;i+=2)i?q.lineTo(h[i],-h[i+1]):q.moveTo(h[i],-h[i+1]);s.holes.push(q);}return s;};
-function flat(f,mat,y,single){let g;try{g=new THREE.ShapeGeometry(shapeOf(f));}catch(e){return;}g.rotateX(-Math.PI/2);g.translate(0,y,0);
+function flat(f,mat,y,single,holes){let g;try{g=new THREE.ShapeGeometry(shapeOf(f,holes||null));}catch(e){return;}g.rotateX(-Math.PI/2);g.translate(0,y,0);
   if(single){const m=new THREE.Mesh(g,mat);m.receiveShadow=true;scene.add(m);return m;}const ng=g.index?g.toNonIndexed():g;addTris(mat,ng.attributes.position.array);}
 function walk(f,step,fn){for(let i=2;i<f.length;i+=2){const ax=f[i-2],az=f[i-1],bx=f[i],bz=f[i+1],L=Math.hypot(bx-ax,bz-az);if(!L)continue;const n=Math.max(1,Math.round(L/step));
   for(let k=0;k<n;k++){const t=(k+.5)/n;fn(ax+(bx-ax)*t,az+(bz-az)*t,(bx-ax)/L,(bz-az)/L,L/n);}}}
@@ -201,7 +204,7 @@ const MAINW=8;
 /* 면 정보(공원·숲·단지 마당 등) */
 const AC={stadium:[0xc9c7bd,2],track:[0xb5523e,6],playground:[0xd8c39a,6],residential:[0xd0d4c6,1],school:[0xe4dfd2,2],construction:[0xb7a77f,2],grass:[0xa9c48a,3],farmland:[0xbdc896,3],village_green:[0x9fbf82,3],
   park:[0x8fb874,4],wood:[0x6f9457,5],forest:[0x6f9457,5],pitch:[0x86b35e,6],parking:[0x9a9ea3,7],water:[0x8cc3de,8],commercial:[0xdcd6cc,1],industrial:[0xcfccc4,1],hospital:[0xe2dcd8,2]};
-for(const[k,,f]of A){const c=AC[k];if(c)flat(f,Mc(c[0],c[1]),.05);}
+for(const[k,,f,ho]of A){const c=AC[k];if(c)flat(f,Mc(c[0],c[1]),.05,false,ho||null);}
 /* 공원·광장 산책로 */
 if(RAD<=5000)for(const f of(D.FW||[]))ribbon(f,2.2,Mc(0xe7dfcd,3),()=>-.045);
 flushTris();
@@ -961,11 +964,11 @@ function frame(){const raw=Math.min(clock.getDelta(),.05),dt=raw*motion;
   updateSignals();npcStep(sdt);railStep(simT);
   updateDrive(raw);if(!ego.on||ego.view==='free')controls.update();renderer.render(scene,camera);placeLabels();cmp.style.transform=`rotate(${controls.getAzimuthalAngle()}rad)`;
   requestAnimationFrame(frame);}
-if(OSM){document.querySelector('.card h1').textContent='우리 동네 3D · '+(D.place||'검색 위치');
+if(OSM){document.querySelector('.card h1').textContent=(window.RE_CONFIG&&RE_CONFIG.title)||('우리 동네 3D · '+(D.place||'검색 위치'));
   document.querySelector('.card p').textContent=`${D.baked?'미리 받아 둔 OpenStreetMap 데이터('+D.baked.at.slice(0,10)+')로':'OpenStreetMap 실시간 데이터로'} 반경 ${RAD/1000} km를 만들었습니다. 층수·차로 수는 OSM에 있는 값을 쓰고, 없으면 건물·도로 종류별 추정값입니다.`+(D.floors?` 층수는 건축물대장(브이월드 GIS건물통합정보, ${D.floors.at}) ${D.floors.n.toLocaleString()}동을 반영했습니다.`:'')+(RAD>5000?' 반경이 커서 큰 건물과 주요 도로만 불러왔습니다.':'');
   $('credit').innerHTML='지도 데이터 © OpenStreetMap 기여자 (ODbL)'+(D.baked?'':' · <a href="'+location.pathname+'" style="color:#2f7bff">노량진 기본 화면</a>');$('loadBar').style.width='100%';}
 document.getElementById('load').classList.remove('on');
-window.town3d={D,camera,controls,view,home,setXray,setNight,setView,startRouteAt,ego,HIDE,LMK,RWD,makeVehicle,makeEgo,scene,tick(n=1,dt=1/30){for(let i=0;i<n;i++){const m=ego.on?ego.mult:1;simT+=dt*m;updateSignals();npcStep(dt*m);railStep(simT);updateDrive(dt);}if(!ego.on||ego.view==='free')controls.update();renderer.render(scene,camera);placeLabels();},get simT(){return simT}};
+window.town3d={D,overpass,camera,controls,view,home,setXray,setNight,setView,startRouteAt,ego,HIDE,LMK,RWD,makeVehicle,makeEgo,scene,tick(n=1,dt=1/30){for(let i=0;i<n;i++){const m=ego.on?ego.mult:1;simT+=dt*m;updateSignals();npcStep(dt*m);railStep(simT);updateDrive(dt);}if(!ego.on||ego.view==='free')controls.update();renderer.render(scene,camera);placeLabels();},get simT(){return simT}};
 frame();
 }
 /* ===== 주소 → 반경 1·3·5 km 불러오기 (Nominatim + Overpass) ===== */
@@ -1019,6 +1022,15 @@ function areaKind(t){if(t.leisure==='park'||t.leisure==='garden'||t.landuse==='r
   if(/^(grass|meadow|cemetery)$/.test(t.landuse||'')||/^(scrub|grassland)$/.test(t.natural||''))return'grass';if(t.landuse==='farmland')return'farmland';
   if(t.landuse==='residential')return'residential';if(t.landuse==='construction')return'construction';if(/^(commercial|retail)$/.test(t.landuse||''))return'commercial';
   if(t.landuse==='industrial')return'industrial';if(/^(school|university|college|kindergarten)$/.test(t.amenity||''))return'school';if(t.amenity==='parking')return'parking';if(t.amenity==='hospital')return'hospital';return null;}
+/* 여러 조각(way)으로 된 OSM 관계(relation)의 외곽선을 끝점끼리 이어 닫힌 고리들로 만든다.
+   예전에는 첫 조각 하나만 써서 한강처럼 큰 강이 일부만 그려졌다. */
+function ringsOf(members,role){const kp=p=>p.lat+','+p.lon,segs=members.filter(m=>m.role===role&&m.geometry&&m.geometry.length>1).map(m=>m.geometry.slice()),out=[];
+  while(segs.length){let ring=segs.shift();
+    for(let g=0;g<5000&&kp(ring[0])!==kp(ring.at(-1));g++){const end=kp(ring.at(-1));let i=segs.findIndex(q=>kp(q[0])===end);
+      if(i>=0){ring=ring.concat(segs.splice(i,1)[0].slice(1));continue;}i=segs.findIndex(q=>kp(q.at(-1))===end);
+      if(i>=0){ring=ring.concat(segs.splice(i,1)[0].reverse().slice(1));continue;}break;}
+    if(ring.length>2)out.push(ring);}
+  return out;}
 /* Overpass(OSM 원본) 경로: 차로 수·신호등·3D 부품·노선색까지 가장 자세함. ui=false면 화면 표시 없이 뒤에서 받음 */
 async function loadOverpassData(ctx,ui,sig){const{lat0,lon0,KX,KZ,R,dLat,dLon,lv,tol}=ctx,n=R<=2000?1:R<=10000?2:R<=15000?3:4,UI=ui?loadUI:{t(){},p(){}},OQ={sig,quiet:!ui};
   const B=[],H=[],A=[],S=[],RLW=[],ST=[],TW=[],FW=[],PL=[],seen=new Set(),P=gm=>gm.map(p=>[(p.lon-lon0)*KX,(lat0-p.lat)*KZ]),r1=a=>Math.round(a*10)/10;
@@ -1031,6 +1043,13 @@ async function loadOverpassData(ctx,ui,sig){const{lat0,lon0,KX,KZ,R,dLat,dLon,lv
       else if(t.man_made&&parseFloat(t.height)>=80)TW.push([r1(x),r1(z),parseFloat(t.height),t.name||'']);
       else if(t.name&&x*x+z*z<R*R){if(t.place)PL.push([t.name,r1(x),r1(z),/^(city|town)$/.test(t.place)?3e6:t.place==='suburb'?1.2e6:5e5,'place']);
         else if(t.tourism||t.historic)PL.push([t.name,r1(x),r1(z),3e5,'heritage']);else if(t.amenity)PL.push([t.name,r1(x),r1(z),/hospital|university|townhall/.test(t.amenity)?1.5e5:6e4,'edu']);}return;}
+    if(el.type==='relation'&&el.members&&!t.building&&!t['building:part']&&!t.railway&&!t.highway){const k=areaKind(t);if(!k)return;
+      const ring=gm=>{let q=P(gm);if(q[0][0]===q.at(-1)[0]&&q[0][1]===q.at(-1)[1])q.pop();return dpL(q,2*tol);};
+      const inn=ringsOf(el.members,'inner').map(ring).filter(q=>q.length>=3).map(q=>q.flat().map(r1));
+      for(const og of ringsOf(el.members,'outer')){const q=ring(og);if(q.length<3)continue;const bx=[Math.min(...q.map(v=>v[0])),Math.max(...q.map(v=>v[0])),Math.min(...q.map(v=>v[1])),Math.max(...q.map(v=>v[1]))];
+        if(!inside(q)&&!(bx[0]<0&&bx[1]>0&&bx[2]<0&&bx[3]>0))continue;const f=q.flat().map(r1);if(areaF(f)<(lv>=2?3000:300))continue;
+        const ho=inn.filter(h=>h[0]>bx[0]&&h[0]<bx[1]&&h[1]>bx[2]&&h[1]<bx[3]);A.push(ho.length?[k,t.name||'',f,ho]:[k,t.name||'',f]);}
+      return;}
     let gm=el.geometry;if(!gm&&el.members){const o=el.members.find(m=>m.role==='outer'&&m.geometry);gm=o&&o.geometry;}if(!gm||gm.length<2)return;
     let pts=P(gm);if(!inside(pts))return;
     if(t.railway){if(!/^(rail|subway|light_rail|monorail|narrow_gauge|tram)$/.test(t.railway)||/^(yard|siding|spur|crossover)$/.test(t.service||''))return;
@@ -1237,7 +1256,6 @@ else (qDef?loadDefault():loadOSM(qAddr,qR*1000)).then(bootSafe).catch(e=>{loadUI
 }
 </script>
 <!-- 부동산 레이어 (공인중개사용 확장) -->
-<script src="re/re-config.js"></script>
 <script src="re/re-core.js"></script>
 <script src="re/re-data.js"></script>
 <script src="re/sgg-codes.js"></script>
@@ -1246,5 +1264,8 @@ else (qDef?loadDefault():loadOSM(qAddr,qR*1000)).then(bootSafe).catch(e=>{loadUI
 <script src="re/re-keys.js"></script>
 <script src="re/re-live.js"></script>
 <script src="re/re-tour.js"></script>
+<script src="re/re-listings.js"></script>
+<script src="re/re-view.js"></script>
+<script src="re/re-idle.js"></script>
 </body>
 </html>

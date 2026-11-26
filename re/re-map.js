@@ -56,12 +56,20 @@
   function brandCard(RD) {
     const card = document.querySelector('.card');
     if (!card) return;
-    card.querySelector('h1').textContent = RD.meta.live ? `${RE.D.place || '우리 동네'} 3D 부동산 지도` : (CFG.title || '3D 부동산 지도');
+    /* 제목은 늘 같게, 지금 보는 동네는 제목 아래 한 줄로 */
+    const h1 = card.querySelector('h1'), title = CFG.title || '3D 부동산 지도';
+    h1.textContent = title; document.title = title;
+    /* 실시간 모드에서는 주소 검색이 가게 이름 등을 돌려줄 수 있어, 사용자가 적은 주소를 그대로 쓴다 */
+    const typed = RD.meta.live ? (new URLSearchParams(location.search).get('addr') || '').trim().slice(0, 60) : '';
+    const place = typed || (RD.meta.live ? RE.D.place : RD.meta.center) || RE.D.place || '우리 동네';
+    let pl = card.querySelector('.re-place');
+    if (!pl) { pl = el('div', 're-place'); h1.after(pl); }
+    pl.textContent = `📍 ${place} · 반경 ${RD.meta.r / 1000} km`;
     const nT = RD.C.reduce((s, c) => s + c.T.length, 0), nR = RD.C.reduce((s, c) => s + c.R.length, 0);
     const m = RD.meta.months.map(s => s.slice(0, 4) + '.' + s.slice(4));
     card.querySelector('p').textContent = `${CFG.subtitle || ''} · 반경 ${RD.meta.r / 1000} km 안 아파트 ${RD.C.length.toLocaleString()}곳, ` +
       `매매 ${nT.toLocaleString()}건 · 전월세 ${nR.toLocaleString()}건 (${m[0]}~${m[1]} 신고분)`;
-    if (CFG.brand) card.insertBefore(el('div', 're-brand', CFG.brand), card.querySelector('.row'));
+    if (CFG.brand) card.insertBefore(el('div', 're-brand', '제작: ' + CFG.brand), card.querySelector('.row'));
     const credit = document.getElementById('credit');
     if (credit) credit.appendChild(el('span', 're-src', ' · 실거래가·건축물대장: 국토교통부(공공데이터포털, 공공누리 제1유형)'));
   }
@@ -270,11 +278,19 @@
       const d = Math.hypot(cam.position.x - c.x, cam.position.y, cam.position.z - c.z);
       cand.push([c, sx, sy, (c.cur.n + 2) / (1 + d * d / 4e5) * (c === state.picked ? 1e6 : 1)]);
     }
+    /* 멀리서 내려다볼수록 가격표 수를 줄인다(읽기 쉽고 화면도 가벼움). 가까이 가면 최대 45개.
+       줄일 때는 값이 높은 단지(평당가 상위 등)를 먼저 남겨 '이 동네 대장 단지'가 보이게 한다 */
+    const camD = RE.T ? cam.position.distanceTo(RE.T.controls.target) : 0;
+    const maxTags = camD ? Math.max(12, Math.min(45, Math.round(45 * 1800 / camD))) : 45;
+    if (maxTags < 45 && cand.length) {
+      const vmax = Math.max(...cand.map(q => q[0].val)) || 1;
+      for (const q of cand) q[3] *= 1 + 3 * Math.max(0, q[0].val) / vmax;
+    }
     cand.sort((a, b) => b[3] - a[3]);
     let n = 0;
     for (const [c, x, y] of cand) {
       const w = 96, r = [x - w / 2, y - 38, x + w / 2, y];
-      if (n >= 45 || occ.some(o => r[0] < o[2] && r[2] > o[0] && r[1] < o[3] && r[3] > o[1])) { show(c.tag, false); continue; }
+      if (n >= maxTags || occ.some(o => r[0] < o[2] && r[2] > o[0] && r[1] < o[3] && r[3] > o[1])) { show(c.tag, false); continue; }
       occ.push(r); n++; show(c.tag, true); c.tag.style.transform = `translate(${x}px,${y}px) translate(-50%,-100%)`;
     }
   }

@@ -112,8 +112,26 @@
   /* ---------- 3) 위치: 지도 속 단지 이름과 맞추기 ---------- */
   const norm = s => String(s || '').toLowerCase().replace(/\(.*?\)|아파트|apt|\s|-|·|,|\./g, '').replace(/제?(\d+)차/g, '$1차');
   const cen = f => { let x = 0, z = 0; for (let i = 0; i < f.length; i += 2) { x += f[i]; z += f[i + 1]; } return [x / (f.length / 2), z / (f.length / 2)]; };
-  function locate(D, C) {
-    const idx = [];
+  /* 타일 자료(Overpass 가 바쁠 때 대신 쓰는 자료)에는 건물 이름이 없다. 이름 붙은 아파트·주거단지만 Overpass 에 가볍게 따로 물어 본다 */
+  async function nameIndex(D) {
+    const named = (D.A || []).some(a => a[1] && a[0] === 'residential') || (D.B || []).some(b => b[2] && b[0] === 'a');
+    const ovp = window.town3d && window.town3d.overpass;
+    if (named || typeof ovp !== 'function' || !D.lat0) return [];
+    const R = (D.r || 1000) * 1.05, KX = 111320 * Math.cos(D.lat0 * Math.PI / 180), KZ = 110950;
+    const bb = [D.lat0 - R / KZ, D.lon0 - R / KX, D.lat0 + R / KZ, D.lon0 + R / KX].map(v => v.toFixed(6)).join(',');
+    const q = `[out:json][timeout:60];(nwr["building"~"^(apartments|residential)$"]["name"](${bb});nwr["landuse"="residential"]["name"](${bb}););out center tags;`;
+    try {
+      const j = await ovp(q, { quiet: true });
+      return (j.elements || []).map(e => {
+        const c = e.center || (e.lat != null ? e : null), t = e.tags || {};
+        if (!c || !t.name) return null;
+        return { n: norm(t.name), pt: [(c.lon - D.lon0) * KX, (D.lat0 - c.lat) * KZ], w: t.landuse ? 2 : 1 };
+      }).filter(Boolean);
+    } catch (e) { console.warn('[RE] 아파트 이름 목록을 받지 못했습니다', e.message); return []; }
+  }
+
+  function locate(D, C, extra = []) {
+    const idx = [...extra];
     for (const [k, n, f] of D.A || []) if (n && k === 'residential') idx.push({ n: norm(n), pt: cen(f), w: 2 });
     for (const b of D.B || []) if (b[2] && b[0] === 'a') idx.push({ n: norm(b[2]), pt: cen(b[3]), w: 1 });
     const R = D.r || 1000, out = [];
@@ -162,7 +180,8 @@
       });
       if (!trades.length && fails.length) throw new Error(fails[0].split(': ').at(-1));
       status('단지 위치를 지도와 맞추는 중…', { pct: .72 });
-      const C = locate(D, group(trades, rents));
+      const extra = await nameIndex(D);
+      const C = locate(D, group(trades, rents), extra);
       if (!C.length) throw new Error('지도에서 위치를 확인한 아파트 단지가 없습니다 (OSM 단지 이름이 없는 지역일 수 있습니다)');
       const top = [...C].sort((a, b) => b.T.length - a.T.length).slice(0, MAX_REG);
       let k = 0;
@@ -173,7 +192,7 @@
       RE.boot({
         meta: { at: new Date().toISOString(), months: [ms[0], ms.at(-1)], center: D.place, r: D.r || 1000, lat0: D.lat0, lon0: D.lon0, live: true, fails: fails.length,
           src: '국토교통부 아파트 매매(상세)·전월세 실거래가, 건축HUB 건축물대장 · 공공데이터포털 · 공공누리 제1유형' },
-        office: null, C,
+        office: RE.myOfficeFor ? RE.myOfficeFor(D) : null, C,
       });
       if (fails.length) status(`일부 자료(${fails.length}건)를 받지 못했습니다. 잠시 뒤 다시 열면 빠진 부분만 다시 받습니다.`, { close: true });
     } catch (e) {

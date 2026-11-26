@@ -89,3 +89,64 @@ body.present .re-card{top:20px;bottom:170px}
 
 /* 한글은 단어 중간에서 줄을 바꾸지 않게 */
 .re-panel,.re-card,.re-sub,.re-keys,.re-live,.re-office{word-break:keep-all;overflow-wrap:anywhere}
+
+/* ===== 제목 아래 동네 줄 · 왼쪽 카드 접기 · 손님용 전체 화면 (re-view.js) ===== */
+.card h1{padding-right:64px}
+.re-place{margin:4px 0 6px;font-size:14px;font-weight:700;color:var(--ink)}
+.re-cfold{position:absolute;top:12px;right:12px;min-height:32px;padding:0 10px;font-size:12px}
+.card.folded>:not(h1):not(.re-place):not(.re-cfold){display:none}
+.card.folded .re-place{margin-bottom:0}
+.re-kiosk-bar{display:none;position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:4;align-items:center;gap:10px;padding:6px 8px 6px 6px;border-radius:999px;background:var(--card);box-shadow:0 4px 16px rgba(0,0,0,.18);opacity:.55;transition:opacity .2s}
+.re-kiosk-bar:hover,.re-kiosk-bar:focus-within{opacity:1}
+.re-kiosk-bar button{min-height:32px;padding:0 12px;font-size:13px}
+.re-kiosk-src{font-size:11px;color:var(--sub);white-space:nowrap}
+body.kiosk .card,body.kiosk .hint{display:none}
+/* 전체 화면: 오른쪽 패널은 색 안내(범례)만 왼쪽 아래에 작게 */
+body.kiosk .re-panel{top:auto;right:auto;left:16px;bottom:16px;width:240px;max-height:none;padding:10px 12px;opacity:.92}
+body.kiosk .re-panel .re-head,body.kiosk .re-panel .re-body>:not(.re-legend){display:none}
+body.kiosk .re-panel.folded .re-body{display:block}
+body.kiosk .re-panel .re-legend{margin-top:0}
+body.kiosk .re-kiosk-bar{display:flex}
+@media(max-width:600px){.re-kiosk-src{display:none}body.kiosk .re-panel{left:12px;right:auto;bottom:64px;width:200px}}
+
+/* ===== 내 매물 (re-listings.js) ===== */
+.re-lst-layer{position:fixed;inset:0;pointer-events:none;z-index:3}
+.re-lst-pin{position:absolute;left:0;top:0;pointer-events:auto;display:flex;align-items:center;gap:4px;min-height:30px;padding:0 10px 0 6px;border:2px solid #fff;border-radius:999px;background:#e8590c;color:#fff;font-size:12.5px;font-weight:800;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer;white-space:nowrap}
+.re-lst-pin:hover,.re-lst-pin:focus-visible{background:#c2410c;outline:2px solid #fff}
+.re-lst-ico{font-size:14px}
+.re-lst-sec{margin:0 0 12px;padding:10px 12px;border-radius:12px;background:rgba(232,89,12,.08);border:1px solid rgba(232,89,12,.35)}
+.re-lst-sec h3{margin:0 0 6px;font-size:15px;color:#c2410c}
+.re-lst-item{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:1px solid rgba(127,127,127,.2);font-size:13px}
+.re-lst-item:first-of-type{border-top:0}
+.re-lst-item b{font-size:15px}.re-lst-item em{font-style:normal;color:var(--sub)}
+.re-lst-cmp{font-weight:700}.re-lst-cmp.down{color:#2f855a}.re-lst-cmp.up{color:#c53030}.re-lst-cmp.eq{color:var(--sub);font-weight:400}
+.re-lst-note{margin:6px 0 0;font-size:11.5px;color:var(--sub)}
+.re-lst-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 8px}
+.re-lst-row input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+.re-lst-pick{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:10px;background:var(--acc);color:#fff;font-weight:700;cursor:pointer}
+.re-lst-row input[type=file]:focus-visible+button,.re-lst-pick:focus-within{outline:2px solid var(--acc)}
+.re-lst-msg{margin:4px 0;font-size:13px;font-weight:700}
+.re-lst-list{font-size:13px;margin-bottom:10px}.re-lst-list p{margin:4px 0}
+.re-lst-bad{margin:4px 0;padding-left:18px;color:#c53030;font-size:12.5px}
+body.driving .re-lst-layer{display:none}
+
+/* ===== 사무실 대기 화면 (re-idle.js) ===== */
+.re-idle{display:none;position:fixed;inset:0;z-index:6;pointer-events:none}
+body.idle .re-idle{display:block}
+body.idle .re-kiosk-bar,body.idle .re-panel{display:none}
+.re-idle-brand{position:absolute;left:32px;bottom:32px;display:flex;flex-direction:column;gap:6px;max-width:min(560px,calc(100vw - 260px));padding:20px 26px;border-radius:20px;background:rgba(255,255,255,.92);color:#1a202c;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.re-idle-brand b{font-size:clamp(24px,3.2vw,40px);line-height:1.15;font-weight:900;color:#c2410c;word-break:keep-all}
+.re-idle-tel{font-size:clamp(20px,2.4vw,30px);font-weight:800;letter-spacing:.02em}
+.re-idle-brand em{font-style:normal;font-size:clamp(14px,1.4vw,18px);color:#4a5568;word-break:keep-all}
+.re-idle-qr{position:absolute;right:32px;bottom:32px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px;border-radius:20px;background:#fff;color:#1a202c;box-shadow:0 12px 40px rgba(0,0,0,.25);font-size:14px;font-weight:700;max-width:200px;text-align:center;word-break:keep-all}
+.re-idle-qr img{display:block;width:168px;height:168px;image-rendering:pixelated}
+.re-idle-hint{position:absolute;left:50%;top:20px;transform:translateX(-50%);margin:0;padding:6px 14px;border-radius:999px;background:rgba(0,0,0,.45);color:#fff;font-size:13px;animation:reIdleHint 6s ease-in-out infinite}
+@keyframes reIdleHint{0%,100%{opacity:0}20%,70%{opacity:1}}
+@media(max-width:700px){.re-idle-brand{left:12px;right:12px;bottom:auto;top:12px;max-width:none}.re-idle-qr{right:12px;bottom:12px}}
+@media(prefers-reduced-motion:reduce){.re-idle-hint{animation:none}}
+
+/* ===== 내 사무소 설정 (re-myoffice.js) ===== */
+.re-my-btn{display:block;width:100%;min-height:36px;margin:10px 0 6px;font-size:13px;background:transparent;border:1px dashed rgba(127,127,127,.5);color:var(--sub)}
+.re-my-btn:hover,.re-my-btn:focus-visible{color:var(--acc);border-color:var(--acc)}
+.re-my-f{display:flex;flex-direction:column;gap:4px;margin:0 0 10px;font-size:13px;font-weight:700}
+.re-my-f input,.re-my-f select{min-height:42px;padding:0 10px;border-radius:10px;border:1px solid rgba(127,127,127,.4);background:var(--btn);color:var(--ink);font-size:14px;font-weight:400}
