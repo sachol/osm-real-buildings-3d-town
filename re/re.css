@@ -171,3 +171,45 @@ body.idle .re-idle-hint{top:12px}
 @keyframes reLtIn{from{opacity:0;transform:translate(-50%,-12px)}to{opacity:1;transform:translate(-50%,0)}}
 @media(prefers-reduced-motion:reduce){.re-lt-cap{animation:none}}
 @media(max-width:700px){.re-lt-cap{top:auto;bottom:12px;padding:12px 14px}}
+
+/* ===== ⚖ 단지 나란히 비교 ===== */
+.re-cmp-add{display:block;width:100%;margin:2px 0 10px;padding:9px 12px;border:1.5px solid #2b6cb0;border-radius:10px;background:#ebf4ff;color:#1a4f8a;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.re-cmp-add.on{background:#2b6cb0;color:#fff}
+.re-cmp-add:disabled{border-color:#cbd5e0;background:#f7fafc;color:#718096;cursor:default}
+.re-cmp-tray{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:5;display:flex;align-items:center;flex-wrap:wrap;gap:8px;max-width:calc(100vw - 32px);padding:8px 10px 8px 14px;border-radius:999px;background:rgba(20,33,58,.94);color:#fff;box-shadow:0 8px 30px rgba(0,0,0,.3);font-size:14px}
+.re-cmp-tray[hidden]{display:none}
+.re-cmp-chip{display:inline-flex;align-items:center;gap:2px;padding:4px 4px 4px 10px;border-radius:999px;background:rgba(255,255,255,.14);white-space:nowrap}
+.re-cmp-chip button{border:0;background:none;color:#fff;font-size:16px;line-height:1;padding:2px 6px;cursor:pointer}
+.re-cmp-go,.re-cmp-clr{border:0;border-radius:999px;padding:7px 14px;font:inherit;font-weight:700;cursor:pointer}
+.re-cmp-go{background:#f6ad55;color:#1a202c}
+.re-cmp-go:disabled{background:rgba(255,255,255,.2);color:#cbd5e0;cursor:default}
+.re-cmp-clr{background:none;color:#cbd5e0;font-weight:400}
+.re-cmp{position:fixed;left:16px;right:16px;bottom:16px;z-index:6;max-height:58vh;overflow:auto;padding:16px 20px 12px;border-radius:18px;background:var(--card);color:var(--ink);box-shadow:0 12px 40px rgba(0,0,0,.35);transform:translateY(110%);visibility:hidden;transition:transform .35s ease,visibility .35s}
+.re-cmp.on{transform:none;visibility:visible}
+.re-cmp header h2{margin:0 40px 2px 0;font-size:20px}
+.re-cmp header p{margin:0 0 10px;font-size:12px;color:var(--sub)}
+.re-cmp-tbl{width:100%;border-collapse:collapse;table-layout:fixed;font-size:14px}
+.re-cmp-tbl th,.re-cmp-tbl td{padding:8px 10px;border-bottom:1px solid rgba(128,128,128,.2);text-align:left;vertical-align:top;word-break:keep-all}
+.re-cmp-tbl thead th{font-size:17px;border-bottom:2px solid #2b6cb0}
+.re-cmp-tbl thead th small,.re-cmp-tbl td small{display:block;font-weight:400;font-size:12px;color:var(--sub)}
+.re-cmp-tbl tbody th{width:150px;color:var(--ink);font-weight:700;font-size:18px} /* 항목 이름도 값과 같은 크기·굵기 */
+.re-cmp-tbl td b{font-size:18px}
+.re-cmp-tbl td.best{background:rgba(56,161,105,.13)}
+.re-cmp-tbl td.best b{color:#276749}
+.re-cmp-tbl b.up{color:#c53030}.re-cmp-tbl b.down{color:#2b6cb0}
+.re-cmp-na{color:var(--sub)}
+.re-cmp .re-foot{margin:8px 0 0;font-size:11px;color:var(--sub)}
+body.cmp-open .re-cmp-tray,body.idle .re-cmp-tray,body.idle .re-cmp,body.present .re-cmp-tray,body.driving .re-cmp-tray,body.driving .re-cmp{display:none}
+body.guest .re-cmp-tbl{font-size:16px}body.guest .re-cmp-tbl td b,body.guest .re-cmp-tbl tbody th{font-size:22px}body.guest .re-cmp-tbl tbody th{width:180px}body.guest .re-cmp-tbl thead th{font-size:20px}
+@media(max-width:640px){.re-cmp{left:8px;right:8px;bottom:8px;max-height:70vh;padding:12px}.re-cmp-tbl tbody th{width:84px}.re-cmp-tbl td b,.re-cmp-tbl tbody th{font-size:15px}}
+@media(prefers-reduced-motion:reduce){.re-cmp{transition:none}}
+
+/* 비교: 표 배경은 불투명(지도 글자가 비쳐 읽기 어려움), 열·지도 번호 색 맞춤 */
+.re-cmp{background:light-dark(#fff,#121824)}
+.re-cmp-tbl tbody th small{display:block;margin-top:2px;font-weight:400;font-size:12px;color:var(--sub)}
+.re-cmp-tbl thead th.c0 b{color:#2b6cb0}.re-cmp-tbl thead th.c1 b{color:#c05621}.re-cmp-tbl thead th.c2 b{color:#6b46c1}
+.re-cmp-layer{position:fixed;inset:0;pointer-events:none;z-index:3}
+.re-cmp-mark{position:absolute;left:0;top:0;padding:4px 10px;border:2px solid #fff;border-radius:999px;color:#fff;font-size:13px;font-weight:800;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.35)}
+.re-cmp-mark.c0{background:#2b6cb0}.re-cmp-mark.c1{background:#c05621}.re-cmp-mark.c2{background:#6b46c1}
+body.cmp-open .re-cmp-mark{font-size:16px;padding:6px 12px}
+body.idle .re-cmp-layer,body.driving .re-cmp-layer{display:none}
