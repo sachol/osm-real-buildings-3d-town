@@ -67,7 +67,7 @@
     const m = RD.meta.months.map(s => s.slice(0, 4) + '.' + s.slice(4));
     card.querySelector('p').textContent = `${CFG.subtitle || ''} · 반경 ${RD.meta.r / 1000} km 안 아파트 ${RD.C.length.toLocaleString()}곳, ` +
       `매매 ${nT.toLocaleString()}건 · 전월세 ${nR.toLocaleString()}건 (${m[0]}~${m[1]} 신고분)`;
-    if (CFG.brand) card.insertBefore(el('div', 're-brand', CFG.brand), card.querySelector('.row'));
+    if (CFG.brand) card.insertBefore(el('div', 're-brand', '제작: ' + CFG.brand), card.querySelector('.row'));
     const credit = document.getElementById('credit');
     if (credit) credit.appendChild(el('span', 're-src', ' · 실거래가·건축물대장: 국토교통부(공공데이터포털, 공공누리 제1유형)'));
   }

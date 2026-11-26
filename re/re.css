@@ -129,3 +129,18 @@ body.kiosk .re-kiosk-bar{display:flex}
 .re-lst-list{font-size:13px;margin-bottom:10px}.re-lst-list p{margin:4px 0}
 .re-lst-bad{margin:4px 0;padding-left:18px;color:#c53030;font-size:12.5px}
 body.driving .re-lst-layer{display:none}
+
+/* ===== 사무실 대기 화면 (re-idle.js) ===== */
+.re-idle{display:none;position:fixed;inset:0;z-index:6;pointer-events:none}
+body.idle .re-idle{display:block}
+body.idle .re-kiosk-bar,body.idle .re-panel{display:none}
+.re-idle-brand{position:absolute;left:32px;bottom:32px;display:flex;flex-direction:column;gap:6px;max-width:min(560px,calc(100vw - 260px));padding:20px 26px;border-radius:20px;background:rgba(255,255,255,.92);color:#1a202c;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.re-idle-brand b{font-size:clamp(24px,3.2vw,40px);line-height:1.15;font-weight:900;color:#c2410c;word-break:keep-all}
+.re-idle-tel{font-size:clamp(20px,2.4vw,30px);font-weight:800;letter-spacing:.02em}
+.re-idle-brand em{font-style:normal;font-size:clamp(14px,1.4vw,18px);color:#4a5568;word-break:keep-all}
+.re-idle-qr{position:absolute;right:32px;bottom:32px;display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px;border-radius:20px;background:#fff;color:#1a202c;box-shadow:0 12px 40px rgba(0,0,0,.25);font-size:14px;font-weight:700;max-width:200px;text-align:center;word-break:keep-all}
+.re-idle-qr img{display:block;width:168px;height:168px;image-rendering:pixelated}
+.re-idle-hint{position:absolute;left:50%;top:20px;transform:translateX(-50%);margin:0;padding:6px 14px;border-radius:999px;background:rgba(0,0,0,.45);color:#fff;font-size:13px;animation:reIdleHint 6s ease-in-out infinite}
+@keyframes reIdleHint{0%,100%{opacity:0}20%,70%{opacity:1}}
+@media(max-width:700px){.re-idle-brand{left:12px;right:12px;bottom:auto;top:12px;max-width:none}.re-idle-qr{right:12px;bottom:12px}}
+@media(prefers-reduced-motion:reduce){.re-idle-hint{animation:none}}

@@ -102,7 +102,7 @@ body.cockpit #cockpit{display:block}
       <p id="vwMsg" class="addrMsg">키가 있으면 지도를 열 때(기본 화면·주소 모드) 건물마다 건축물대장 지상층수·높이를 받아 화면에만 씁니다. 키 발급 때 서비스 URL을 이 페이지 주소로 등록하세요. 키는 이 브라우저에만 저장됩니다.</p></details>
   </form>
   <small id="credit">지도 데이터 © OpenStreetMap 기여자 (ODbL)</small>
-  <small class="dev">개발: GPT PARK · <a href="https://www.youtube.com/@AIFACT-GPTPARK" target="_blank" rel="noopener">유튜브</a> · <a href="https://gptparkai.com/" target="_blank" rel="noopener">공식 사이트</a></small>
+  <small class="dev">원작: GPT PARK의 <a href="https://github.com/muzbox1973/osm-real-buildings-3d-town" target="_blank" rel="noopener">OSM Real Buildings 3D Town</a> (MIT)</small>
 </div>
 <div id="toast"></div>
 <div id="cockpit"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice" width="100%" height="100%"><path d="M0 900V700Q800 610 1600 700V900Z" fill="#15181d"/><path d="M0 700Q800 610 1600 700" stroke="#2b3038" stroke-width="10" fill="none"/><g transform="translate(560 860)"><circle r="190" fill="none" stroke="#0e1014" stroke-width="42"/><path d="M-185 -10H185M0 -10V180" stroke="#0e1014" stroke-width="34"/><circle r="46" fill="#1c2026"/><text y="10" text-anchor="middle" fill="#38bdf8" font-size="28" font-weight="700">AUTO</text></g><path d="M0 0L120 0 40 700H0Z" fill="#101318" opacity=".9"/><path d="M1600 0L1480 0 1560 700H1600Z" fill="#101318" opacity=".9"/></svg></div>
@@ -1264,5 +1264,6 @@ else (qDef?loadDefault():loadOSM(qAddr,qR*1000)).then(bootSafe).catch(e=>{loadUI
 <script src="re/re-tour.js"></script>
 <script src="re/re-listings.js"></script>
 <script src="re/re-view.js"></script>
+<script src="re/re-idle.js"></script>
 </body>
 </html>
