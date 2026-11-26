@@ -36,7 +36,7 @@
 
   /* ---------- 순서대로 돌기 ---------- */
   let run = 0, pausedUntil = 0, wakeT = 0;
-  const wanted = () => body.classList.contains('idle') || body.classList.contains('guest');
+  const wanted = () => (body.classList.contains('idle') || body.classList.contains('guest')) && !body.classList.contains('cmp-open'); // ⚖ 비교 중엔 쉼
   const ctl = () => window.town3d && window.town3d.controls;
   const wait = ms => new Promise(r => setTimeout(r, ms));
   const stops = () => (RE.listings && RE.listings.groups ? [...RE.listings.groups()] : []).filter(([c]) => Number.isFinite(c.x));
