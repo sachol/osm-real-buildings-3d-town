@@ -41,8 +41,10 @@
   ov.append(brand, qrBox, hint);
   body.append(ov);
 
+  /* 수강생 '내 사무소' 설정일 때는 휴대폰 브리핑이 기본 동네 자료라 QR 을 숨긴다 */
+  if (CFG.custom) qrBox.hidden = true;
   async function drawQR() {
-    if (qrImg.src) return;
+    if (qrImg.src || CFG.custom) return;
     try {
       const qr = (await loadQR())(0, 'M'); qr.addData(briefURL()); qr.make();
       qrImg.src = qr.createDataURL(6, 2);

@@ -76,6 +76,9 @@ body.cockpit #cockpit{display:block}
 @media(max-width:600px){.nav b{font-size:20px}.nav svg{width:42px;height:42px}#mini{width:140px;height:140px;bottom:auto;top:96px}.spd b{font-size:34px}}
 @media(max-width:600px){.card{padding:12px 14px}.card h1{font-size:17px}.card p,.card small{display:none}button{font-size:13px;padding:0 10px}.hint{display:none}.lb{font-size:11px}}
 </style>
+<!-- 설정은 먼저 읽는다: 내 사무소 설정(수강생용)이 있으면 그 동네로 바로 시작해야 하므로 -->
+<script src="re/re-config.js"></script>
+<script src="re/re-myoffice.js"></script>
 </head>
 <body>
 <div id="stage"><div id="labels"></div></div>
@@ -965,7 +968,7 @@ if(OSM){document.querySelector('.card h1').textContent=(window.RE_CONFIG&&RE_CON
   document.querySelector('.card p').textContent=`${D.baked?'미리 받아 둔 OpenStreetMap 데이터('+D.baked.at.slice(0,10)+')로':'OpenStreetMap 실시간 데이터로'} 반경 ${RAD/1000} km를 만들었습니다. 층수·차로 수는 OSM에 있는 값을 쓰고, 없으면 건물·도로 종류별 추정값입니다.`+(D.floors?` 층수는 건축물대장(브이월드 GIS건물통합정보, ${D.floors.at}) ${D.floors.n.toLocaleString()}동을 반영했습니다.`:'')+(RAD>5000?' 반경이 커서 큰 건물과 주요 도로만 불러왔습니다.':'');
   $('credit').innerHTML='지도 데이터 © OpenStreetMap 기여자 (ODbL)'+(D.baked?'':' · <a href="'+location.pathname+'" style="color:#2f7bff">노량진 기본 화면</a>');$('loadBar').style.width='100%';}
 document.getElementById('load').classList.remove('on');
-window.town3d={D,camera,controls,view,home,setXray,setNight,setView,startRouteAt,ego,HIDE,LMK,RWD,makeVehicle,makeEgo,scene,tick(n=1,dt=1/30){for(let i=0;i<n;i++){const m=ego.on?ego.mult:1;simT+=dt*m;updateSignals();npcStep(dt*m);railStep(simT);updateDrive(dt);}if(!ego.on||ego.view==='free')controls.update();renderer.render(scene,camera);placeLabels();},get simT(){return simT}};
+window.town3d={D,overpass,camera,controls,view,home,setXray,setNight,setView,startRouteAt,ego,HIDE,LMK,RWD,makeVehicle,makeEgo,scene,tick(n=1,dt=1/30){for(let i=0;i<n;i++){const m=ego.on?ego.mult:1;simT+=dt*m;updateSignals();npcStep(dt*m);railStep(simT);updateDrive(dt);}if(!ego.on||ego.view==='free')controls.update();renderer.render(scene,camera);placeLabels();},get simT(){return simT}};
 frame();
 }
 /* ===== 주소 → 반경 1·3·5 km 불러오기 (Nominatim + Overpass) ===== */
@@ -1253,7 +1256,6 @@ else (qDef?loadDefault():loadOSM(qAddr,qR*1000)).then(bootSafe).catch(e=>{loadUI
 }
 </script>
 <!-- 부동산 레이어 (공인중개사용 확장) -->
-<script src="re/re-config.js"></script>
 <script src="re/re-core.js"></script>
 <script src="re/re-data.js"></script>
 <script src="re/sgg-codes.js"></script>

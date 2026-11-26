@@ -59,7 +59,9 @@
     /* 제목은 늘 같게, 지금 보는 동네는 제목 아래 한 줄로 */
     const h1 = card.querySelector('h1'), title = CFG.title || '3D 부동산 지도';
     h1.textContent = title; document.title = title;
-    const place = (RD.meta.live ? RE.D.place : RD.meta.center) || RE.D.place || '우리 동네';
+    /* 실시간 모드에서는 주소 검색이 가게 이름 등을 돌려줄 수 있어, 사용자가 적은 주소를 그대로 쓴다 */
+    const typed = RD.meta.live ? (new URLSearchParams(location.search).get('addr') || '').trim().slice(0, 60) : '';
+    const place = typed || (RD.meta.live ? RE.D.place : RD.meta.center) || RE.D.place || '우리 동네';
     let pl = card.querySelector('.re-place');
     if (!pl) { pl = el('div', 're-place'); h1.after(pl); }
     pl.textContent = `📍 ${place} · 반경 ${RD.meta.r / 1000} km`;

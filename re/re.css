@@ -144,3 +144,9 @@ body.idle .re-kiosk-bar,body.idle .re-panel{display:none}
 @keyframes reIdleHint{0%,100%{opacity:0}20%,70%{opacity:1}}
 @media(max-width:700px){.re-idle-brand{left:12px;right:12px;bottom:auto;top:12px;max-width:none}.re-idle-qr{right:12px;bottom:12px}}
 @media(prefers-reduced-motion:reduce){.re-idle-hint{animation:none}}
+
+/* ===== 내 사무소 설정 (re-myoffice.js) ===== */
+.re-my-btn{display:block;width:100%;min-height:36px;margin:10px 0 6px;font-size:13px;background:transparent;border:1px dashed rgba(127,127,127,.5);color:var(--sub)}
+.re-my-btn:hover,.re-my-btn:focus-visible{color:var(--acc);border-color:var(--acc)}
+.re-my-f{display:flex;flex-direction:column;gap:4px;margin:0 0 10px;font-size:13px;font-weight:700}
+.re-my-f input,.re-my-f select{min-height:42px;padding:0 10px;border-radius:10px;border:1px solid rgba(127,127,127,.4);background:var(--btn);color:var(--ink);font-size:14px;font-weight:400}
