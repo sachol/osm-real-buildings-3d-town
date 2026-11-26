@@ -473,7 +473,7 @@ for(const bE of B){const[t,lv,name,f]=bE;const bb=bbox(f),cx=(bb[0]+bb[1])/2,cz=
   if(OSM){fl=osmFloors(t,lv,ar);side=colorHex(bE[7],pick(OCOL[t]||cc));const rc=colorHex(bE[10],0);roof=rc?roofOf(rc):OROOF[t]?roofOf(pick(OROOF[t])):roofM;
     const top=bE[4]||fl*(t==='a'?2.9:t==='i'?4.5:3.3),base=Math.min(bE[5]||0,top-1),rs=bE[6]||'',sh=/^(pyramidal|hipped|cone|dome|onion|round|half-dome|gabled|skillion|gambrel|mansard)$/.test(rs);
     let rh=0;if(sh)rh=bE[9]||Math.min((top-base)*.45,/dome|onion|round/.test(rs)?Math.sqrt(ar/Math.PI):Math.sqrt(ar)*.3);
-    const wt=Math.max(base+.5,top-rh),vk=lv>0&&bE[4]>0&&!base?Math.max(.5,Math.min(2,lv*3/(wt-base))):1;addExtrude(f,wt-base,sideMat(side),roof,base,bE[12],vk);if(rh>.3)roofTris(f,wt,rh,rs,dMat(rc||(OROOF[t]?pick(OROOF[t]):0x8a9aa3)));continue;}
+    const wt=Math.max(base+.5,top-rh),vk=lv>0&&!base?Math.max(.5,Math.min(2,lv*3/(wt-base))):1;addExtrude(f,wt-base,sideMat(side),roof,base,bE[12],vk);if(rh>.3)roofTris(f,wt,rh,rs,dMat(rc||(OROOF[t]?pick(OROOF[t]):0x8a9aa3)));continue;}
 }
 
 flushExtrude();
